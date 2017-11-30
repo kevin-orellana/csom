@@ -596,7 +596,25 @@ void *mm_realloc(void *ptr, size_t size)
     void *oldptr = ptr;
     void *newptr;
     size_t copySize;
+    
+    if(size == 0){
+        mm_free(oldptr);
+        return 0;
+    }
+    // if pointer is NULL, just malloc the size
+    if (oldptr == NULL){
+        return mm_malloc(size);
+    }
 
+    // if the size is less than DSIZE, just make it standard size MINSIZE
+    if(size <= DSIZE){
+        size = MINSIZE;
+    }
+        // if size is large enough, add DSIZE and then round it to the nearest
+        // DSIZE multiple
+    else {
+        size = DSIZE * ((size + (DSIZE) + (DSIZE - 1)) / DSIZE);
+    }
     newptr = mm_malloc(size);
     if (newptr == NULL)
         return NULL;
