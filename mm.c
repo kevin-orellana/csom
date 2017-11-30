@@ -1,3 +1,27 @@
+
+/*  .-----------. 
+ *  | MALLOCLAB |
+ *  .-----------. 
+ * FILE: mm.c
+ * NAME:     Richard Chiang
+ * ANDREWID: rchiang
+ *  .----------. 
+ *  | OVERVIEW |
+ *  .----------.
+ *  SEGREGATED FREE LIST:
+ *  ---------------------
+ *  Malloclab focuses on the creation of a dynamic storage allocator for C 
+ *  C programs. We will implement our own version of the malloc, free, realloc,
+ *  and calloc functions. I initialized 20 blocks for the linked list, as well 
+ *  as well as 4 blocks for epilogue blocks, prologue blocks, and a beginner 0 
+ *  block. Then what I did was to implement a linked list for size blocks of the 
+ *  power of 2 where any size above 2^21 will be in the last free list. The free
+ *  list is ordered from smallest size to largest. Adding new blocks to the 
+ *  free list is through searching the list for the right size. Removing blocks
+ *  just finding the right location and manipulating next and previous ptrs. 
+ *  The other functions will have their specifications listed:
+>>>>>>> c907a1a1c3047b8f428f820ff6aa0af8cbfd1b28
+ */
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,34 +33,42 @@
 #include <stdint.h>
 #include <stdio.h>
 
-team_t team = {
-        /* Team name */
-        "Zui Hao Xuesheng",
-        /* First member's full name */
-        "Kevin Orellana",
-        /* First member's github username*/
-        "kevin-orellana",
-        /* Second member's full name (leave blank if none) */
-        "Anthony Schalhoub",
-        /* Second member's github username (leave blank if none) */
-        "hkjs"
-};
 
-/* ============== MACROS ============= */
+#define Verbose 0
+///* If you want debugging output, use the following macro.  When you hand
+// * in, remove the #define DEBUG line. */
+//#define DEBUG
+//#ifdef DEBUG
+//# define dbg_printf(...) printf(__VA_ARGS__)
+//#else
+//# define dbg_printf(...)
+//#endif
 
-#define DEBUG 0  // set to 1 to print debugging statements
 
-/* Memory Allocator dimensions */
-#define WSIZE   sizeof(void*)  // W_SIZE is word size. In Ubuntu 64-bit architecture, this is 8 bytes.
-#define DSIZE   (2 * WSIZE)
-#define MINSIZE (2 * DSIZE)  // minimum size for a memory block is 32 bytes
-#define CHUNKSIZE   (1<<12)  // amount to extend heap by
+/* do not change the following! */
+//#ifdef DRIVER
+///* create aliases for driver tests */
+//#define malloc mm_malloc
+//#define free mm_free
+//#define realloc mm_realloc
+//#define calloc mm_calloc
+//#endif /* def DRIVER */
 
-/* Comparison functions*/
+/* single word (4) or double word (8) alignment */
+//#define ALIGNMENT   (16)
+#define WSIZE       sizeof(void*)
+#define DSIZE       (2 * WSIZE)
+#define MINSIZE     (2 * DSIZE)
+#define CHUNKSIZE   (1<<12)
+
+/* gets the value that's larger from x and y */
 #define MAX(x, y)           ((x) > (y)? (x) : (y))
 #define MIN(x, y)           ((x) < (y)? (x) : (y))
 
-/* packs together a size mask and an allocated bit into val ot put in header */
+/* rounds up to the nearest multiple of ALIGNMENT */
+//#define ALIGN(p)            (((size_t)(p) + (ALIGNMENT-1)) & ~0x7)
+
+/* packs together a size and an allocate bit into val ot put in header */
 #define PACK(size, allocated_bit)   ((size) | (allocated_bit))
 
 /* Read and write a word at address p */
@@ -67,8 +99,23 @@ team_t team = {
 #define DREF_NP(bp)          (*(char**) NEXT_LSTP(bp))
 #define DREF_PP(bp)          (*(char**) PREV_LSTP(bp))
 
-/* ============== GLOBAL VARIABLES ============== */
+/* DEBUG MODE */
+#define DEBUGMODE            0  // 0 is off, 1 is on
 
+team_t team = {
+        /* Team name */
+        "os",
+        /* First member's full name */
+        "k",
+        /* First member's email address */
+        "a",
+        /* Second member's full name (leave blank if none) */
+        "y",
+        /* Second member's email address (leave blank if none) */
+        "o"
+};
+
+/* GLOBAL VARIABLES */
 char* heapStart;
 char** tableStart;
 
@@ -76,10 +123,11 @@ char** tableStart;
 
 /* Original Functions */
 int mm_init(void);
-void mm_free (void *bp);
 void *mm_realloc(void *oldptr, size_t size);
+void *mm_calloc (size_t nmemb, size_t size);
+void mm_checkheap(int lineno);
 
-/* Segregated List Implementation function helpers */
+/* function helpers */
 static void *coalesce(void* bp);
 static void *extend_heap(size_t words);
 static void *find_fit(size_t size);
@@ -89,8 +137,10 @@ static void removeBlock(void* bp);
 
 /* debugging functions */
 static int in_heap(const void *p);
+static int aligned(const void *p);
 void mm_checkheap(int lineno);
 
+/* End Function Prototypes */
 
 /*============================================================================*/
 //                                  mm_init                                   //
@@ -101,17 +151,20 @@ void mm_checkheap(int lineno);
 // a new trace, it resets your heap to the empty heap by calling your mm init //
 // function.                                                                  //                                
 /*============================================================================*/
-
 int mm_init(void)
 {
     // Allocate enough memory in beginning for 20 blocks of
     // space for linked list
-
-    tableStart = mem_sbrk(10 * DSIZE);
-
+    if (Verbose){
+        printf("tableStart = mem_sbrk(20*WSIZE); mm_init mm.c\n");
+    }
+    tableStart = mem_sbrk(20*WSIZE);
     if((long)(tableStart) == -1)
         return -1;
 
+    if (Verbose){
+        printf("for(int i = 0; i < 20; i++){ tableStart[i] = NULL; mm_init mm.c\n");
+    }
     // Initialize all entries for the linked list to be NULL
     for(int i = 0; i < 20; i++){
         tableStart[i] = NULL;
@@ -120,12 +173,24 @@ int mm_init(void)
     // Allocate enough memory for 4 blocks for epilogue, prologue
     // and beginning bits.
 
+    if (Verbose){
+        printf("heapStart = mem_sbrk(4*WSIZE); mm_init mm.c\n");
+        printf("heapStart %p\n", heapStart);
+    }
     heapStart = mem_sbrk(4*WSIZE);
     if((long)(heapStart) == -1)
         return -1;
 
+    if (Verbose){
+        printf("PUT(heapStart + (0*WSIZE), 0); mm_init mm.c\n");
+        printf("heapStart %p\n", heapStart);
+    }
     // Place start block, prologue blocks, and epilogue block.
     PUT(heapStart + (0*WSIZE), 0);
+    if (Verbose){
+        printf("PUT(heapStart +(1*WSIZE), PACK(DSIZE,1); mm_init mm.c\n");
+        printf("heapStart %p\n", heapStart);
+    }
     PUT(heapStart + (1*WSIZE), PACK(DSIZE,1));
     PUT(heapStart + (2*WSIZE), PACK(DSIZE,1));
     PUT(heapStart + (3*WSIZE), PACK(0,1));
@@ -134,7 +199,7 @@ int mm_init(void)
     heapStart += (2*WSIZE);
 
     // Extend the heap by a standard size to start off
-    if(extend_heap(CHUNKSIZE) == NULL)
+    if(extend_heap(CHUNKSIZE/WSIZE) == NULL)
         return -1;
 
     return 0;
@@ -194,6 +259,12 @@ static void *coalesce(void* bp)
 
     // Add the new coalesced block onto the linked list
     addBlock(bp);
+
+    // DEBUGMODE is on if user types -D on terminal command. Debugmode checks 
+    // the heap, the stack, and the linked list for correctness. 
+    if(DEBUGMODE){
+        mm_checkheap(1);
+    }
 
     return bp;
 }
@@ -339,6 +410,11 @@ static void addBlock(char* ptr)
             SET(PREV_LSTP(ptr), np);
             SET(NEXT_LSTP(np), ptr);
         }
+    }
+
+    // check if the number of free blocks are the same.
+    if(DEBUGMODE){
+        mm_checkheap(2);
     }
     return;
 }
@@ -576,10 +652,42 @@ void *mm_realloc(void *oldptr, size_t size)
     return newptr;
 }
 
+/*============================================================================*/
+//                                 calloc                                     //
+//----------------------------------------------------------------------------//
+// Allocates memory for an array of nmemb elements of size bytes each and     //
+// returns a pointer to the allocated memory. The memory is set to zero       //
+// before returning.                                                          //
+/*============================================================================*/
+//void *calloc (size_t nmemb, size_t size)
+//{
+//    size_t bytes = nmemb * size;
+//    void *newptr;
+//
+//    // allocate bytes amount of memory
+//    newptr = mm_malloc(bytes);
+//    // set all memory to 0 (default)
+//    memset(newptr, 0, bytes);
+//
+//    return newptr;
+//}
+
+
+/*
+ * Return whether the pointer is in the heap.
+ * May be useful for debugging.
+ */
 static int in_heap(const void *p) {
     return p <= mem_heap_hi() && p >= mem_heap_lo();
 }
 
+/*
+ * Return whether the pointer is aligned.
+ * May be useful for debugging.
+ */
+//static int aligned(const void *p) {
+//    return (size_t) ALIGN(p) == (size_t) p;
+//}
 
 
 /*============================================================================*/
@@ -695,7 +803,6 @@ void mm_checkheap(int lineno)
     char* rabbit;
     char* turtle;
 
-    /*
     for(int i = 0; i < 20; i++){
         rabbit = tableStart[i];
         turtle = rabbit;
@@ -733,7 +840,7 @@ void mm_checkheap(int lineno)
                 }
             }
         }
-    }*/
+    }
 
     /*===================== Segregated Free list Checker =====================*/
     // Goes through the segregated free list, and checks pointer consistency, //
