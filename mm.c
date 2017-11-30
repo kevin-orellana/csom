@@ -4,18 +4,17 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h> //
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <stdint.h>
+//#include <stdlib.h>
+//#include <unistd.h>
+//#include <stdbool.h>
+//#include <stdint.h>
 
 #include "mm.h"
 #include "memlib.h"
 
 
-#include <stdbool.h>
-#include <stdint.h>
+//#include <stdbool.h>
+//#include <stdint.h>
 
 #define WSIZE       sizeof(void*)
 #define DSIZE       (2 * WSIZE)
@@ -111,35 +110,35 @@ void mm_checkheap(int lineno);
 // a new trace, it resets your heap to the empty heap by calling your mm init //
 // function.                                                                  //                                
 /*============================================================================*/
-int mm_init(void)
+int mm_init()
 {
     // Allocate enough memory in beginning for 20 blocks of
     // space for linked list
-    tableStart = mem_sbrk(20*WSIZE);
-    if((long)(tableStart) == -1)
+    tableStart = mem_sbrk(20 * WSIZE);
+    if((long)(tableStart) == -1) {
         return -1;
+    }
 
 
     // Initialize all entries for the linked list to be NULL
-    for(int i = 0; i < 20; i++){
-        tableStart[i] = NULL;
-    }
+//    for(int i = 0; i < 20; i++){
+//        tableStart[i] = NULL;
+//    }
 
     // Allocate enough memory for 4 blocks for epilogue, prologue
     // and beginning bits.
 
 
     heapStart = mem_sbrk(4*WSIZE);
-    if((long)(heapStart) == -1)
+    if((long)(heapStart) == -1) {
         return -1;
-
+    }
 
     // Place start block, prologue blocks, and epilogue block.
-    PUT(heapStart + (0*WSIZE), 0);
-
-    PUT(heapStart + (1*WSIZE), PACK(DSIZE,1));
-    PUT(heapStart + (2*WSIZE), PACK(DSIZE,1));
-    PUT(heapStart + (3*WSIZE), PACK(0,1));
+    PUT(heapStart + (0 * WSIZE), 0);
+    PUT(heapStart + (1 * WSIZE), PACK(DSIZE, 1));
+    PUT(heapStart + (2 * WSIZE), PACK(DSIZE, 1));
+    PUT(heapStart + (3 * WSIZE), PACK(0,1));
 
     // Change the start of the heap to be where the prologue blocks are
     heapStart += (2*WSIZE);
