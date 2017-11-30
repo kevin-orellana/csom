@@ -527,7 +527,7 @@ void mm_free (void *bp)
 //   the address of this new block. The contents of the new block are the same// 
 //   as those of the old ptr block, up to the minimum of the old and new sizes// 
 /*============================================================================*/
-void *mm_realloc2(void *oldptr, size_t size)
+void *mm_realloc(void *oldptr, size_t size)
 {
     size_t oldsize;
     size_t nextsize;
@@ -591,40 +591,7 @@ void *mm_realloc2(void *oldptr, size_t size)
     return newptr;
 }
 
-void *mm_realloc(void *ptr, size_t size)
-{
-    void *oldptr = ptr;
-    void *newptr;
-    size_t copySize;
-    
-    if(size == 0){
-        mm_free(oldptr);
-        return 0;
-    }
-    // if pointer is NULL, just malloc the size
-    if (oldptr == NULL){
-        return mm_malloc(size);
-    }
 
-    // if the size is less than DSIZE, just make it standard size MINSIZE
-    if(size <= DSIZE){
-        size = MINSIZE;
-    }
-        // if size is large enough, add DSIZE and then round it to the nearest
-        // DSIZE multiple
-    else {
-        size = DSIZE * ((size + (DSIZE) + (DSIZE - 1)) / DSIZE);
-    }
-    newptr = mm_malloc(size);
-    if (newptr == NULL)
-        return NULL;
-    copySize = *(size_t *)((char *)oldptr - SIZE_T_SIZE);
-    if (size < copySize)
-        copySize = size;
-    memcpy(newptr, oldptr, copySize);
-    mm_free(oldptr);
-    return newptr;
-}
 
 /*============================================================================*/
 //                                 calloc                                     //
