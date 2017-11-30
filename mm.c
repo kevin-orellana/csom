@@ -1,61 +1,22 @@
 
-/*  .-----------.
- *  | MALLOCLAB |
- *  .-----------.
- * FILE: mm.c
- * NAME:     Richard Chiang
- * ANDREWID: rchiang
- *  .----------.
- *  | OVERVIEW |
- *  .----------.
- *  SEGREGATED FREE LIST:
- *  ---------------------
- *  Malloclab focuses on the creation of a dynamic storage allocator for C
- *  C programs. We will implement our own version of the malloc, free, realloc,
- *  and calloc functions. I initialized 20 blocks for the linked list, as well
- *  as well as 4 blocks for epilogue blocks, prologue blocks, and a beginner 0
- *  block. Then what I did was to implement a linked list for size blocks of the
- *  power of 2 where any size above 2^21 will be in the last free list. The free
- *  list is ordered from smallest size to largest. Adding new blocks to the
- *  free list is through searching the list for the right size. Removing blocks
- *  just finding the right location and manipulating next and previous ptrs.
- *  The other functions will have their specifications listed:
->>>>>>> c907a1a1c3047b8f428f820ff6aa0af8cbfd1b28
- */
-#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <unistd.h>
+#include <string.h> //
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "memlib.h"
-#include "mm.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
+
+#include "mm.h"
+#include "memlib.h"
 
 
-#define Verbose 0
-///* If you want debugging output, use the following macro.  When you hand
-// * in, remove the #define DEBUG line. */
-//#define DEBUG
-//#ifdef DEBUG
-//# define dbg_printf(...) printf(__VA_ARGS__)
-//#else
-//# define dbg_printf(...)
-//#endif
+#include <stdbool.h>
+#include <stdint.h>
 
-
-/* do not change the following! */
-//#ifdef DRIVER
-///* create aliases for driver tests */
-//#define malloc mm_malloc
-//#define free mm_free
-//#define realloc mm_realloc
-//#define calloc mm_calloc
-//#endif /* def DRIVER */
-
-/* single word (4) or double word (8) alignment */
-//#define ALIGNMENT   (16)
 #define WSIZE       sizeof(void*)
 #define DSIZE       (2 * WSIZE)
 #define MINSIZE     (2 * DSIZE)
@@ -99,27 +60,26 @@
 #define DREF_NP(bp)          (*(char**) NEXT_LSTP(bp))
 #define DREF_PP(bp)          (*(char**) PREV_LSTP(bp))
 
-/* DEBUG MODE */
-#define DEBUGMODE            0  // 0 is off, 1 is on
-
+/*********************************************************
+ * NOTE TO STUDENTS: Before you do anything else, please
+ * provide your team information in the following struct.
+ ********************************************************/
 team_t team = {
         /* Team name */
-        "os",
+        "ZuiHaoXueSheng",
         /* First member's full name */
-        "k",
-        /* First member's email address */
-        "a",
+        "Kevin Orellana",
+        /* First member's github username*/
+        "kevin-orellana",
         /* Second member's full name (leave blank if none) */
-        "y",
-        /* Second member's email address (leave blank if none) */
-        "o"
+        "Anthony Schalhoub",
+        /* Second member's github username (leave blank if none) */
+        "hkjs"
 };
 
 /* GLOBAL VARIABLES */
 char* heapStart;
 char** tableStart;
-
-/* Start Function Prototypes */
 
 /* Original Functions */
 int mm_init(void);
@@ -155,16 +115,11 @@ int mm_init(void)
 {
     // Allocate enough memory in beginning for 20 blocks of
     // space for linked list
-    if (Verbose){
-        printf("tableStart = mem_sbrk(20*WSIZE); mm_init mm.c\n");
-    }
     tableStart = mem_sbrk(20*WSIZE);
     if((long)(tableStart) == -1)
         return -1;
 
-    if (Verbose){
-        printf("for(int i = 0; i < 20; i++){ tableStart[i] = NULL; mm_init mm.c\n");
-    }
+
     // Initialize all entries for the linked list to be NULL
     for(int i = 0; i < 20; i++){
         tableStart[i] = NULL;
@@ -173,24 +128,15 @@ int mm_init(void)
     // Allocate enough memory for 4 blocks for epilogue, prologue
     // and beginning bits.
 
-    if (Verbose){
-        printf("heapStart = mem_sbrk(4*WSIZE); mm_init mm.c\n");
-        printf("heapStart %p\n", heapStart);
-    }
+
     heapStart = mem_sbrk(4*WSIZE);
     if((long)(heapStart) == -1)
         return -1;
 
-    if (Verbose){
-        printf("PUT(heapStart + (0*WSIZE), 0); mm_init mm.c\n");
-        printf("heapStart %p\n", heapStart);
-    }
+
     // Place start block, prologue blocks, and epilogue block.
     PUT(heapStart + (0*WSIZE), 0);
-    if (Verbose){
-        printf("PUT(heapStart +(1*WSIZE), PACK(DSIZE,1); mm_init mm.c\n");
-        printf("heapStart %p\n", heapStart);
-    }
+
     PUT(heapStart + (1*WSIZE), PACK(DSIZE,1));
     PUT(heapStart + (2*WSIZE), PACK(DSIZE,1));
     PUT(heapStart + (3*WSIZE), PACK(0,1));
@@ -260,11 +206,6 @@ static void *coalesce(void* bp)
     // Add the new coalesced block onto the linked list
     addBlock(bp);
 
-    // DEBUGMODE is on if user types -D on terminal command. Debugmode checks 
-    // the heap, the stack, and the linked list for correctness. 
-    if(DEBUGMODE){
-        mm_checkheap(1);
-    }
 
     return bp;
 }
@@ -413,9 +354,7 @@ static void addBlock(char* ptr)
     }
 
     // check if the number of free blocks are the same.
-    if(DEBUGMODE){
-        mm_checkheap(2);
-    }
+
     return;
 }
 
@@ -916,8 +855,7 @@ void mm_checkheap(int lineno)
         exit(1);
     }
 
-    // print statement to tell me if my debug mode is on.
-    printf("debug is on\n");
+
 
     return;
 }
