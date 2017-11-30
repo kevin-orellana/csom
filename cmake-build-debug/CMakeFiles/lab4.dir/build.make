@@ -43,10 +43,10 @@ RM = /Applications/CLion.app/Contents/bin/cmake/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4"
+CMAKE_SOURCE_DIR = "/Users/ko/Google Drive/Fall '17/CSO/csom"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug"
+CMAKE_BINARY_DIR = "/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug"
 
 # Include any dependencies generated for this target.
 include CMakeFiles/lab4.dir/depend.make
@@ -66,6 +66,6 @@ CMakeFiles/lab4.dir/clean:
 .PHONY : CMakeFiles/lab4.dir/clean
 
 CMakeFiles/lab4.dir/depend:
-	cd "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4" "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4" "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug" "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug" "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug/CMakeFiles/lab4.dir/DependInfo.cmake" --color=$(COLOR)
+	cd "/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/ko/Google Drive/Fall '17/CSO/csom" "/Users/ko/Google Drive/Fall '17/CSO/csom" "/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug" "/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug" "/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug/CMakeFiles/lab4.dir/DependInfo.cmake" --color=$(COLOR)
 .PHONY : CMakeFiles/lab4.dir/depend
 

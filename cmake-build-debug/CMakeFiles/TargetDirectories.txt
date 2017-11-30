@@ -1,3 +1,3 @@
-/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug/CMakeFiles/lab4.dir
+/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug/CMakeFiles/lab4.dir
