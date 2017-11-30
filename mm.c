@@ -1,24 +1,24 @@
 
-/*  .-----------. 
+/*  .-----------.
  *  | MALLOCLAB |
- *  .-----------. 
+ *  .-----------.
  * FILE: mm.c
  * NAME:     Richard Chiang
  * ANDREWID: rchiang
- *  .----------. 
+ *  .----------.
  *  | OVERVIEW |
  *  .----------.
  *  SEGREGATED FREE LIST:
  *  ---------------------
- *  Malloclab focuses on the creation of a dynamic storage allocator for C 
+ *  Malloclab focuses on the creation of a dynamic storage allocator for C
  *  C programs. We will implement our own version of the malloc, free, realloc,
- *  and calloc functions. I initialized 20 blocks for the linked list, as well 
- *  as well as 4 blocks for epilogue blocks, prologue blocks, and a beginner 0 
- *  block. Then what I did was to implement a linked list for size blocks of the 
+ *  and calloc functions. I initialized 20 blocks for the linked list, as well
+ *  as well as 4 blocks for epilogue blocks, prologue blocks, and a beginner 0
+ *  block. Then what I did was to implement a linked list for size blocks of the
  *  power of 2 where any size above 2^21 will be in the last free list. The free
- *  list is ordered from smallest size to largest. Adding new blocks to the 
+ *  list is ordered from smallest size to largest. Adding new blocks to the
  *  free list is through searching the list for the right size. Removing blocks
- *  just finding the right location and manipulating next and previous ptrs. 
+ *  just finding the right location and manipulating next and previous ptrs.
  *  The other functions will have their specifications listed:
 >>>>>>> c907a1a1c3047b8f428f820ff6aa0af8cbfd1b28
  */

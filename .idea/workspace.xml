@@ -12,7 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43496f3d-3312-4636-bf4e-e4fe9664d1f0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mdriver.c" afterPath="$PROJECT_DIR$/mdriver.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mm.c" afterPath="$PROJECT_DIR$/mm.c" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,20 +24,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="mm.c" pinned="false" current-in-tab="false">
+      <file leaf-file-name="mm.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mm.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="150" column="14" lean-forward="false" selection-start-line="150" selection-start-column="14" selection-end-line="150" selection-end-column="14" />
+            <state relative-caret-position="210">
+              <caret line="14" column="33" lean-forward="false" selection-start-line="14" selection-start-column="33" selection-end-line="14" selection-end-column="33" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mdriver.c" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mdriver.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mdriver.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
+            <state relative-caret-position="1204">
               <caret line="594" column="39" lean-forward="true" selection-start-line="594" selection-start-column="39" selection-end-line="594" selection-end-column="39" />
               <folding />
             </state>
@@ -61,6 +61,7 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/mdriver.c" />
+        <option value="$PROJECT_DIR$/mm.c" />
       </list>
     </option>
   </component>
@@ -140,12 +141,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1512084471104</updated>
-      <workItem from="1512084472358" duration="340000" />
+      <workItem from="1512084472358" duration="540000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="340000" />
+    <option name="totallyTimeSpent" value="540000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="1023" extended-state="6" />
@@ -182,18 +183,18 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/mm.c">
+    <entry file="file://$PROJECT_DIR$/mdriver.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="150" column="14" lean-forward="false" selection-start-line="150" selection-start-column="14" selection-end-line="150" selection-end-column="14" />
+        <state relative-caret-position="1204">
+          <caret line="594" column="39" lean-forward="true" selection-start-line="594" selection-start-column="39" selection-end-line="594" selection-end-column="39" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mdriver.c">
+    <entry file="file://$PROJECT_DIR$/mm.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="594" column="39" lean-forward="true" selection-start-line="594" selection-start-column="39" selection-end-line="594" selection-end-column="39" />
+        <state relative-caret-position="210">
+          <caret line="14" column="33" lean-forward="false" selection-start-line="14" selection-start-column="33" selection-end-line="14" selection-end-column="33" />
           <folding />
         </state>
       </provider>
