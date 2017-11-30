@@ -1,4 +1,4 @@
-# Install script for directory: /Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4
+# Install script for directory: /Users/ko/Google Drive/Fall '17/CSO/csom
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,5 +35,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/ko/Google Drive/Fall '17/CSO/labs-kevin-orellana/lab4/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/ko/Google Drive/Fall '17/CSO/csom/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
