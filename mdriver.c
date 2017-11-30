@@ -243,10 +243,7 @@ int main(int argc, char **argv)
     /*
      * Optionally run and evaluate the libc malloc package 
      */
-    if (verbose > 1){
-		printf("\nTesting libc malloc in mdriver\n");
-		printf("libc_stats = (stats_t *)calloc(num_tracefiles, sizeof(stats_t)); mdriver\n");
-    /* Allocate libc stats array, with one stats_t struct per tracefile */}
+    /* Allocate libc stats array, with one stats_t struct per tracefile */
 
     libc_stats = (stats_t *)calloc(num_tracefiles, sizeof(stats_t));
 	printf("libc_states...done");
@@ -255,16 +252,11 @@ int main(int argc, char **argv)
 	unix_error("libc_stats calloc in main failed");
     
     /* Evaluate the libc malloc package using the K-best scheme */
-	if (verbose > 1)
-		printf(" for (i=0; i < num_tracefiles; i++) { trace = read_trace(tracedir, tracefiles[i]);tlibc_stats[i].ops = trace->num_ops;\n");
 
 	for (i=0; i < num_tracefiles; i++) {
-		if (verbose > 1)
-			printf("trace = read_trace(tracedir, tracefiles[i]);libc_stats[i].ops = trace->num_ops;");
 	trace = read_trace(tracedir, tracefiles[i]);
 	libc_stats[i].ops = trace->num_ops;
-	if (verbose > 1)
-	    printf("Checking libc malloc for correctness, ");
+
 	libc_stats[i].valid = eval_libc_valid(trace, i);
 	if (libc_stats[i].valid) {
 		    speed_params.trace = trace;
@@ -275,17 +267,10 @@ int main(int argc, char **argv)
 	free_trace(trace);
     }
     /* Display the libc results in a compact table */
-    if (verbose) {
-	printf("\nResults for libc malloc:\n");
-	printresults(num_tracefiles, libc_stats, false);
-    }
 
     /*
      * Always run and evaluate the student's mm package
      */
-    if (verbose > 1)
-	printf("\nTesting mm malloc\n");
-
     /* Allocate the mm stats array, with one stats_t struct per tracefile */
     mm_stats = (stats_t *)calloc(num_tracefiles, sizeof(stats_t));
     if (mm_stats == NULL)
@@ -600,7 +585,6 @@ static int eval_mm_valid(trace_t *trace, int tracenum, range_t **ranges)
 //printf("interpret each opeartion in eval_mm_valid\n ");
     /* Interpret each operation in the trace in order */
     for (i = 0;  i < trace->num_ops;  i++) {
-//	printf("trace: %d", i);
 	index = trace->ops[i].index;
 	size = trace->ops[i].size;
 
