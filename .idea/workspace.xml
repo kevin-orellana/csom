@@ -12,7 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43496f3d-3312-4636-bf4e-e4fe9664d1f0" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/orig.c" afterPath="$PROJECT_DIR$/mmWorkingSeg.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mm.c" afterPath="$PROJECT_DIR$/mm.c" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -38,8 +37,8 @@
       <file leaf-file-name="mm.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mm.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-362">
-              <caret line="19" column="31" lean-forward="false" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
+            <state relative-caret-position="189">
+              <caret line="603" column="18" lean-forward="false" selection-start-line="603" selection-start-column="18" selection-end-line="603" selection-end-column="18" />
               <folding>
                 <element signature="e#329#353#0" expanded="true" />
                 <element signature="e#412#547#0" expanded="true" />
@@ -70,6 +69,7 @@
       <find>DEBUG</find>
       <find>realloc</find>
       <find>aligned</find>
+      <find>calloc</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -79,8 +79,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/mdriver.c" />
-        <option value="$PROJECT_DIR$/mm.c" />
         <option value="$PROJECT_DIR$/orig.c" />
+        <option value="$PROJECT_DIR$/mm.c" />
       </list>
     </option>
   </component>
@@ -161,12 +161,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1512084471104</updated>
-      <workItem from="1512084472358" duration="2202000" />
+      <workItem from="1512084472358" duration="2258000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2202000" />
+    <option name="totallyTimeSpent" value="2258000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="708" y="23" width="946" height="1023" extended-state="0" />
@@ -221,8 +221,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mm.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-362">
-          <caret line="19" column="31" lean-forward="false" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
+        <state relative-caret-position="189">
+          <caret line="603" column="18" lean-forward="false" selection-start-line="603" selection-start-column="18" selection-end-line="603" selection-end-column="18" />
           <folding>
             <element signature="e#329#353#0" expanded="true" />
             <element signature="e#412#547#0" expanded="true" />

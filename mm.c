@@ -599,18 +599,18 @@ void *realloc(void *oldptr, size_t size)
 // returns a pointer to the allocated memory. The memory is set to zero       //
 // before returning.                                                          //
 /*============================================================================*/
-void *calloc (size_t nmemb, size_t size)
-{
-    size_t bytes = nmemb * size;
-    void *newptr;
-
-    // allocate bytes amount of memory
-    newptr = malloc(bytes);
-    // set all memory to 0 (default)
-    memset(newptr, 0, bytes);
-
-    return newptr;
-}
+//void *calloc (size_t nmemb, size_t size)
+//{
+//    size_t bytes = nmemb * size;
+//    void *newptr;
+//
+//    // allocate bytes amount of memory
+//    newptr = malloc(bytes);
+//    // set all memory to 0 (default)
+//    memset(newptr, 0, bytes);
+//
+//    return newptr;
+//}
 
 
 /*
