@@ -594,9 +594,9 @@ static int in_heap(const void *p) {
  * Return whether the pointer is aligned.
  * May be useful for debugging.
  */
-static int aligned(const void *p) {
-    return (size_t)ALIGN(p) == (size_t)p;
-}
+//static int aligned(const void *p) {
+//    return (size_t)ALIGN(p) == (size_t)p;
+//}
 
 /*============================================================================*/
 //                               mm_checkheap                                 //
