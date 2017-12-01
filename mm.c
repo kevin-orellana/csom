@@ -1,20 +1,4 @@
-/* mm seg description */
-
-/*#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <unistd.h>
-#include <string.h> //
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "mm.h"
-#include "memlib.h"
-
-#include <stdbool.h>
-#include <stdint.h>*/
+/* mm seg description change this */
 
 #include <assert.h>
 #include <stdio.h>
@@ -25,39 +9,64 @@
 #include "mm.h"
 #include "memlib.h"
 
+/*********************************************************
+ * NOTE TO STUDENTS: Before you do anything else, please
+ * provide your team information in the following struct.
+ ********************************************************/
+
 team_t team = {
      /* Team name */
-     "csoteam",
+     "ZuiHaoXueSheng",
      /* First member's full name */
-     "Jinyang Li",
+     "Kevin Orellana",
      /* First member's github username*/
-     "jinyangli",
+     " kevin-orellana",
      /* Second member's full name (leave blank if none) */
-     "",
+     "Anthony Schalhoub",
      /* Second member's github username (leave blank if none) */
-     ""
+     "hkjs"
 };
+
+/* Describe the functions you'll use in the implementation
+ * Categorize them as "original, seg-list implementation helpers and debugging" */
+
+/* Original Functions */
+int mm_init(void);
+void *mm_malloc(size_t size);
+void mm_free(void *ptr);
+void *mm_realloc(void *ptr, size_t size);
+void mm_checkheap(int verbose);
+
+/* function helpers */
+static void *coalesce(void* bp);
+static void *extend_heap(size_t words);
+static void *find_fit(size_t size);
+static void place(void* bp, size_t asize);
+static void addBlock(char* bp);
+static void removeBlock(void* bp);
+
+/* debugging functions */
+static int in_heap(const void *p);
+static int aligned(const void *p);
+
+/* End program function overview */
+
+ /* Describe the macros used and reference them to Bryant 2002 */
 
 # define dbg_printf(...) printf(__VA_ARGS__)
 
-#define WSIZE       (sizeof(void*))
-#define DSIZE       (2 * WSIZE)
+#define WSIZE       (8)
+#define DSIZE       (8)
 #define MINSIZE     (2 * DSIZE)
 #define CHUNKSIZE   (1<<12)
 
 /* gets the value that's larger from x and y */
 #define MAX(x, y)   ((x) > (y)? (x) : (y))
-#define MIN(x, y)   ((x) < (y)? (x) : (y))
-
-/* rounds up to the nearest multiple of ALIGNMENT */
-//#define ALIGN(p)            (((size_t)(p) + (ALIGNMENT-1)) & ~0x7)
 
 /* packs together a size and an allocate bit into val ot put in header */
 #define PACK(size, allocated_bit)   ((size) | (allocated_bit))
 
 /* Read and write a word at address p */
-//#define GET(p)              (*(uintptr_t *)(p))
-//#define PUT(p, val)         (*(uintptr_t *)(p) = (val))
 #define GET(p)              (*(unsigned long *)(p))
 #define PUT(p, val)         (*(unsigned long *)(p) = (val))
 
@@ -77,45 +86,22 @@ team_t team = {
 #define PREV_BLKP(bp)       ((char *)(bp) - GET_SIZE(((char *)(bp) - DSIZE)))
 
 /*Given block ptr bp, compute address of the location of the next/prev ptr in
-  list */
+  list. DESCRIBE/CHANGE THIS. */
 #define NEXT_LSTP(bp)       ((char*) (bp) + WSIZE)
 #define PREV_LSTP(bp)       ((char*) (bp))
 
-/*Given address to next location, derefernece it */
+/*Given address to next location, derefernece it. DESCRIBE/CHANGE THIS. */
 #define DREF_NP(bp)          (*(char**) NEXT_LSTP(bp))
 #define DREF_PP(bp)          (*(char**) PREV_LSTP(bp))
 
 /* DEBUG MODE */
 #define DEBUGMODE            0  // 0 is off, 1 is on
 
-/* GLOBAL VARIABLES */
+/* GLOBAL VARIABLES DESCRIBE THEM */
 char* heapStart;
 char** tableStart;
 
-/* Start Function Prototypes */
-
-/* Original Functions */
-int mm_init(void);
-void *mm_malloc(size_t size);
-void mm_free(void *ptr);
-void *mm_realloc(void *oldptr, size_t size);
-void *calloc (size_t nmemb, size_t size);
-void mm_checkheap(int lineno);
-
-/* function helpers */
-static void *coalesce(void* bp);
-static void *extend_heap(size_t words);
-static void *find_fit(size_t size);
-static void place(void* bp, size_t asize);
-static void addBlock(char* bp);
-static void removeBlock(void* bp);
-
-/* debugging functions */
-static int in_heap(const void *p);
-static int aligned(const void *p);
-void mm_checkheap(int lineno);
-
-/* End Function Prototypes */
+/*BEGIN WRITING FUNCTIONS*/
 
 /*============================================================================*/
 //                                  mm_init                                   //
@@ -158,6 +144,56 @@ int mm_init(void)
 
     return 0;
 }
+
+/*============================================================================*/
+//                                  malloc                                    //
+//----------------------------------------------------------------------------//
+// The malloc routine returns a pointer to an allocated block payload of at   //
+// least size bytes. The entire allocated block should lie within the heap    //
+// region and should not overlap with any other allocated chunk. Malloc       //
+// always returns an 8-byte aligned pointer.                                  //
+/*============================================================================*/
+void *mm_malloc (size_t size)
+{
+    char* bp = NULL;
+    size_t asize;
+    size_t extension;
+
+    // ignore extraneous requests.
+    if (size == 0)
+        return NULL;
+
+    // if the size is less than DSIZE, just make it standard size MINSIZE
+    if(size <= DSIZE){
+        asize = MINSIZE;
+    }
+        // if size is large enough, add DSIZE and then round it to the nearest
+        // DSIZE multiple
+    else {
+        asize = DSIZE * ((size + (DSIZE) + (DSIZE - 1)) / DSIZE);
+    }
+
+    // search for the size in the seg free list. If there is one, place the
+    // block into the free list.
+    if((bp = find_fit(asize)) != NULL){
+        place(bp, asize);
+        return bp;
+    }
+    // else extend the size by asize or chunksize, whichever is larger
+    // to avoid having to calculate extra information.
+    extension = MAX(asize, CHUNKSIZE);
+
+    // extend heap since there arent enough free blocks in the free list.
+    // extend by the extension.
+    if((bp = extend_heap(extension/WSIZE)) == NULL){
+        return NULL;
+    }
+    // Next, place the block into the newly allocated memory.
+    place(bp, asize);
+
+    return bp;
+}
+
 
 /*============================================================================*/
 //                                 coalesce                                   //
@@ -453,54 +489,6 @@ static void place(void* bp, size_t asize)
     }
 }
 
-/*============================================================================*/
-//                                  malloc                                    //
-//----------------------------------------------------------------------------//
-// The malloc routine returns a pointer to an allocated block payload of at   //
-// least size bytes. The entire allocated block should lie within the heap    //
-// region and should not overlap with any other allocated chunk. Malloc       //
-// always returns an 8-byte aligned pointer.                                  //
-/*============================================================================*/
-void *mm_malloc (size_t size)
-{
-    char* bp = NULL;
-    size_t asize;
-    size_t extension;
-
-    // ignore extraneous requests.
-    if (size == 0)
-        return NULL;
-
-    // if the size is less than DSIZE, just make it standard size MINSIZE
-    if(size <= DSIZE){
-        asize = MINSIZE;
-    }
-        // if size is large enough, add DSIZE and then round it to the nearest
-        // DSIZE multiple
-    else {
-        asize = DSIZE * ((size + (DSIZE) + (DSIZE - 1)) / DSIZE);
-    }
-
-    // search for the size in the seg free list. If there is one, place the
-    // block into the free list.
-    if((bp = find_fit(asize)) != NULL){
-        place(bp, asize);
-        return bp;
-    }
-    // else extend the size by asize or chunksize, whichever is larger
-    // to avoid having to calculate extra information.
-    extension = MAX(asize, CHUNKSIZE);
-
-    // extend heap since there arent enough free blocks in the free list.
-    // extend by the extension.
-    if((bp = extend_heap(extension/WSIZE)) == NULL){
-        return NULL;
-    }
-    // Next, place the block into the newly allocated memory.
-    place(bp, asize);
-
-    return bp;
-}
 
 /*============================================================================*/
 //                                  free                                      //
@@ -542,7 +530,7 @@ void mm_free (void *bp)
 //   the address of this new block. The contents of the new block are the same//
 //   as those of the old ptr block, up to the minimum of the old and new sizes//
 /*============================================================================*/
-void *mm_realloc(void *oldptr, size_t size)
+void *mm_realloc(void *ptr, size_t size)
 {
     size_t oldsize;
     size_t nextsize;
