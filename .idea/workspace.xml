@@ -12,6 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="43496f3d-3312-4636-bf4e-e4fe9664d1f0" name="Default" comment="">
+      <change type="MOVED" beforePath="$PROJECT_DIR$/orig.c" afterPath="$PROJECT_DIR$/mmWorkingSeg.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mm.c" afterPath="$PROJECT_DIR$/mm.c" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -24,24 +25,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="mm.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mm.c">
+      <file leaf-file-name="mmWorkingSeg.c" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mmWorkingSeg.c">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="361">
-              <caret line="150" column="25" lean-forward="true" selection-start-line="150" selection-start-column="25" selection-end-line="150" selection-end-column="25" />
+              <caret line="150" column="25" lean-forward="false" selection-start-line="150" selection-start-column="25" selection-end-line="150" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="orig.c" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/orig.c">
+      <file leaf-file-name="mm.c" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/mm.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="225" column="19" lean-forward="false" selection-start-line="225" selection-start-column="19" selection-end-line="225" selection-end-column="19" />
+            <state relative-caret-position="-362">
+              <caret line="19" column="31" lean-forward="false" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
               <folding>
-                <element signature="e#1373#1397#0" expanded="true" />
-                <element signature="e#1456#1591#0" expanded="true" />
+                <element signature="e#329#353#0" expanded="true" />
+                <element signature="e#412#547#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -160,12 +161,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1512084471104</updated>
-      <workItem from="1512084472358" duration="2136000" />
+      <workItem from="1512084472358" duration="2202000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2136000" />
+    <option name="totallyTimeSpent" value="2202000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="708" y="23" width="946" height="1023" extended-state="0" />
@@ -210,21 +211,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mm.c">
+    <entry file="file://$PROJECT_DIR$/mmWorkingSeg.c">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="361">
-          <caret line="150" column="25" lean-forward="true" selection-start-line="150" selection-start-column="25" selection-end-line="150" selection-end-column="25" />
+          <caret line="150" column="25" lean-forward="false" selection-start-line="150" selection-start-column="25" selection-end-line="150" selection-end-column="25" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/orig.c">
+    <entry file="file://$PROJECT_DIR$/mm.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="225" column="19" lean-forward="false" selection-start-line="225" selection-start-column="19" selection-end-line="225" selection-end-column="19" />
+        <state relative-caret-position="-362">
+          <caret line="19" column="31" lean-forward="false" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
           <folding>
-            <element signature="e#1373#1397#0" expanded="true" />
-            <element signature="e#1456#1591#0" expanded="true" />
+            <element signature="e#329#353#0" expanded="true" />
+            <element signature="e#412#547#0" expanded="true" />
           </folding>
         </state>
       </provider>
