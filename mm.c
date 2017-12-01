@@ -23,15 +23,10 @@ team_t team = {
 /* If you want debugging output, use the following macro.  When you hand
  * in, remove the #define DEBUG line. */
 #define DEBUG
-#ifdef DEBUG
 # define dbg_printf(...) printf(__VA_ARGS__)
 #else
 # define dbg_printf(...)
 #endif
-
-
-/* do not change the following! */
-#ifdef DRIVER
 
 /* single word (4) or double word (8) alignment */
 #define ALIGNMENT   (8)
