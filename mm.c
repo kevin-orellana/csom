@@ -98,8 +98,8 @@ static int aligned(const void *p);
 /* DEBUG MODE DELETE THIS EVENTUALLY*/
 #define DEBUGMODE            0  // 0 is off, 1 is on
 
-/* GLOBAL VARIABLES. DESCRIBE THIS */
-char* heap_pointer;
+/* GLOBAL VARIABLES DESCRI */
+char* heapStart;
 char** tableStart;
 
 
