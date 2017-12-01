@@ -39,8 +39,8 @@
           <file leaf-file-name="mm.c" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/mm.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="332">
-                  <caret line="599" column="0" lean-forward="true" selection-start-line="599" selection-start-column="0" selection-end-line="599" selection-end-column="0" />
+                <state relative-caret-position="485">
+                  <caret line="40" column="44" lean-forward="false" selection-start-line="40" selection-start-column="44" selection-end-line="40" selection-end-column="44" />
                   <folding />
                 </state>
               </provider>
@@ -73,7 +73,7 @@
           <file leaf-file-name="mmWorkingSeg.c" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/mmWorkingSeg.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="30">
+                <state relative-caret-position="330">
                   <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
                   <folding />
                 </state>
@@ -101,6 +101,7 @@
       <find>ifdef</find>
       <find>SET(</find>
       <find>aligned</find>
+      <find>deb</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -191,12 +192,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1512084471104</updated>
-      <workItem from="1512084472358" duration="3479000" />
+      <workItem from="1512084472358" duration="3704000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3479000" />
+    <option name="totallyTimeSpent" value="3704000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -259,8 +260,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mm.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
-          <caret line="599" column="0" lean-forward="true" selection-start-line="599" selection-start-column="0" selection-end-line="599" selection-end-column="0" />
+        <state relative-caret-position="485">
+          <caret line="40" column="44" lean-forward="false" selection-start-line="40" selection-start-column="44" selection-end-line="40" selection-end-column="44" />
           <folding />
         </state>
       </provider>

@@ -1,4 +1,6 @@
- #include <stdio.h>
+/* mm seg description */
+
+/*#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
@@ -11,9 +13,32 @@
 #include "mm.h"
 #include "memlib.h"
 
-
 #include <stdbool.h>
-#include <stdint.h>
+#include <stdint.h>*/
+
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "mm.h"
+#include "memlib.h"
+
+team_t team = {
+     /* Team name */
+     "csoteam",
+     /* First member's full name */
+     "Jinyang Li",
+     /* First member's github username*/
+     "jinyangli",
+     /* Second member's full name (leave blank if none) */
+     "",
+     /* Second member's github username (leave blank if none) */
+     ""
+};
+
+# define dbg_printf(...) printf(__VA_ARGS__)
 
 #define WSIZE       (sizeof(void*))
 #define DSIZE       (2 * WSIZE)
