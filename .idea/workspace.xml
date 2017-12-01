@@ -27,8 +27,8 @@
       <file leaf-file-name="mm.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mm.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1327">
-              <caret line="195" column="0" lean-forward="true" selection-start-line="195" selection-start-column="0" selection-end-line="195" selection-end-column="0" />
+            <state relative-caret-position="520">
+              <caret line="577" column="38" lean-forward="false" selection-start-line="577" selection-start-column="38" selection-end-line="577" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -55,6 +55,7 @@
       <find>aligned</find>
       <find>realloc</find>
       <find>MIN(</find>
+      <find>oldptr</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -147,12 +148,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1512084471104</updated>
-      <workItem from="1512084472358" duration="4669000" />
+      <workItem from="1512084472358" duration="4732000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4669000" />
+    <option name="totallyTimeSpent" value="4732000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="674" y="23" width="1006" height="1023" extended-state="0" />
@@ -223,8 +224,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mm.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1327">
-          <caret line="195" column="0" lean-forward="true" selection-start-line="195" selection-start-column="0" selection-end-line="195" selection-end-column="0" />
+        <state relative-caret-position="520">
+          <caret line="577" column="38" lean-forward="false" selection-start-line="577" selection-start-column="38" selection-end-line="577" selection-end-column="38" />
           <folding />
         </state>
       </provider>
