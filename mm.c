@@ -1,3 +1,4 @@
+/* mm seg description */
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +7,18 @@
 
 #include "mm.h"
 #include "memlib.h"
+team_t team = {
+        /* Team name */
+        "ZuiHaoZueSheng",
+        /* First member's full name */
+        "Kevin Orellana",
+        /* First member's github username*/
+        " kevin-orellana",
+        /* Second member's full name (leave blank if none) */
+        "Anthony Schalhoub",
+        /* Second member's github username (leave blank if none) */
+        " hkjs"
+};
 
 /* If you want debugging output, use the following macro.  When you hand
  * in, remove the #define DEBUG line. */
@@ -591,26 +604,6 @@ void *realloc(void *oldptr, size_t size)
     free(oldptr);
     return newptr;
 }
-
-/*============================================================================*/
-//                                 calloc                                     //
-//----------------------------------------------------------------------------//
-// Allocates memory for an array of nmemb elements of size bytes each and     //
-// returns a pointer to the allocated memory. The memory is set to zero       //
-// before returning.                                                          //
-/*============================================================================*/
-//void *calloc (size_t nmemb, size_t size)
-//{
-//    size_t bytes = nmemb * size;
-//    void *newptr;
-//
-//    // allocate bytes amount of memory
-//    newptr = malloc(bytes);
-//    // set all memory to 0 (default)
-//    memset(newptr, 0, bytes);
-//
-//    return newptr;
-//}
 
 
 /*
