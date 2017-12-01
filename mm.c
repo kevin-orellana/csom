@@ -48,23 +48,23 @@ static void removeBlock(void* bp);
 /* debugging functions */
 static int in_heap(const void *p);
 static int aligned(const void *p);
-void mm_checkheap(int lineno);
+//void mm_checkheap(int lineno); delete
 
-/* End Function Prototypes */
+/* END DESCRIPTION OF FUNCTIONS change this */
 
+/* BEGIN DESCRIPTION OF MACROS */
 # define dbg_printf(...) printf(__VA_ARGS__)
 
-#define WSIZE       (sizeof(void*))
-#define DSIZE       (2 * WSIZE)
-#define MINSIZE     (2 * DSIZE)
-#define CHUNKSIZE   (1<<12)
+#define WSIZE       (8)  /* Word and header/footer size (bytes) */
+#define DSIZE       (16)  /* Double word size (bytes) */
+#define MINSIZE     (32)  /* Minimum size of block (bytes) */
+#define CHUNKSIZE   (1<<12)  /* Extend heap by this amount (bytes) */
 
 /* gets the value that's larger from x and y */
 #define MAX(x, y)   ((x) > (y)? (x) : (y))
-#define MIN(x, y)   ((x) < (y)? (x) : (y))
 
 /* packs together a size and an allocate bit into val ot put in header */
-#define PACK(size, allocated_bit)   ((size) | (allocated_bit))
+#define PACK(size, bit)   ((size) | (bit))
 
 /* Read and write a word at address p */
 #define GET(p)              (*(unsigned long *)(p))
@@ -74,8 +74,8 @@ void mm_checkheap(int lineno);
 #define SET(P1, P2)          (*(unsigned long *)(P1) = (unsigned long)(P2))
 
 /* Read the size and allocated fields from address p */
-#define GET_SIZE(p)         (GET(p) & ~(DSIZE - 1))
-#define GET_ALLOC(p)        (GET(p) & 0x1)
+#define GET_SIZE(p) (GET(p) & ~0x7)
+#define GET_ALLOC(p)    (GET(p) & 0x1)
 
 /* given block pointer bp, compute the address of the header/footer */
 #define HDRP(bp)            ((char*) bp - WSIZE)
