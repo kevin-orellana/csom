@@ -78,26 +78,27 @@ static int aligned(const void *p);
 #define GET_ALLOC(p)    (GET(p) & 0x1)
 
 /* given block pointer bp, compute the address of the header/footer */
-#define HDRP(bp)            ((char*) bp - WSIZE)
-#define FTRP(bp)            ((char*) bp + (GET_SIZE(HDRP(bp)) - DSIZE))
+#define HDRP(bp)            ((char *) (bp) - WSIZE)
+#define FTRP(bp)            ((char *) (bp) + (GET_SIZE(HDRP(bp)) - DSIZE))
 
 /*Given block ptr bp, compute address of previous and next block */
 #define NEXT_BLKP(bp)       ((char *)(bp) + GET_SIZE(((char *)(bp) - WSIZE)))
 #define PREV_BLKP(bp)       ((char *)(bp) - GET_SIZE(((char *)(bp) - DSIZE)))
 
+
 /*Given block ptr bp, compute address of the location of the next/prev ptr in
-  list */
+  list CHANGE/DESCRIBE THIS */
 #define NEXT_LSTP(bp)       ((char*) (bp) + WSIZE)
 #define PREV_LSTP(bp)       ((char*) (bp))
 
-/*Given address to next location, derefernece it */
+/*Given address to next location, derefernece it CHANGE/DESCRIBE THIS*/
 #define DREF_NP(bp)          (*(char**) NEXT_LSTP(bp))
 #define DREF_PP(bp)          (*(char**) PREV_LSTP(bp))
 
-/* DEBUG MODE */
+/* DEBUG MODE DELETE THIS EVENTUALLY*/
 #define DEBUGMODE            0  // 0 is off, 1 is on
 
-/* GLOBAL VARIABLES */
+/* GLOBAL VARIABLES DESCRIBE THIS */
 char* heapStart;
 char** tableStart;
 
