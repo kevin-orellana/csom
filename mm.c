@@ -32,12 +32,6 @@ team_t team = {
 
 /* do not change the following! */
 #ifdef DRIVER
-/* create aliases for driver tests */
-#define malloc mm_malloc
-#define free mm_free
-#define realloc mm_realloc
-#define calloc mm_calloc
-#endif /* def DRIVER */
 
 /* single word (4) or double word (8) alignment */
 #define ALIGNMENT   (8)
@@ -95,9 +89,9 @@ char** tableStart;
 
 /* Original Functions */
 int mm_init(void);
-void *malloc(size_t size);
-void free(void *ptr);
-void *realloc(void *oldptr, size_t size);
+void *mm_malloc(size_t size);
+void mm_free(void *ptr);
+void *mm_realloc(void *oldptr, size_t size);
 void *calloc (size_t nmemb, size_t size);
 void mm_checkheap(int lineno);
 
@@ -460,7 +454,7 @@ static void place(void* bp, size_t asize)
 // region and should not overlap with any other allocated chunk. Malloc       //
 // always returns an 8-byte aligned pointer.                                  //
 /*============================================================================*/
-void *malloc (size_t size)
+void *mm_malloc (size_t size)
 {
     char* bp = NULL;
     size_t asize;
@@ -506,10 +500,10 @@ void *malloc (size_t size)
 //----------------------------------------------------------------------------//
 // The free routine frees the block pointed to by ptr. It returns nothing.    //
 // This routine is only guaranteed to work when the passed pointer (ptr) was  //
-// returned by an earlier call to malloc, calloc, or realloc and has not yet  //
+// returned by an earlier call to malloc, or realloc and has not yet  //
 // been freed. free(NULL) has no effect.                                      //
 /*============================================================================*/
-void free (void *bp)
+void mm_free (void *bp)
 {
     // if bp is NULL, don't do anything
     if(!bp) return;
@@ -541,7 +535,7 @@ void free (void *bp)
 //   the address of this new block. The contents of the new block are the same//
 //   as those of the old ptr block, up to the minimum of the old and new sizes//
 /*============================================================================*/
-void *realloc(void *oldptr, size_t size)
+void *mm_realloc(void *oldptr, size_t size)
 {
     size_t oldsize;
     size_t nextsize;
@@ -549,12 +543,12 @@ void *realloc(void *oldptr, size_t size)
 
     // if size == 0, it means just free the pointer
     if(size == 0){
-        free(oldptr);
+        mm_free(oldptr);
         return 0;
     }
     // if pointer is NULL, just malloc the size
     if (oldptr == NULL){
-        return malloc(size);
+        return mm_malloc(size);
     }
 
     // if the size is less than DSIZE, just make it standard size MINSIZE
@@ -592,7 +586,7 @@ void *realloc(void *oldptr, size_t size)
     }
 
     // else not enough space so malloc the size.
-    newptr = malloc(size);
+    newptr = mm_malloc(size);
 
     // if it's NULL, just return it.
     if (!newptr){
@@ -601,7 +595,7 @@ void *realloc(void *oldptr, size_t size)
     // else copy all the previous memory to the new block.
     memcpy(newptr, oldptr, oldsize);
     // free the old block to be used later.
-    free(oldptr);
+    mm_free(oldptr);
     return newptr;
 }
 
