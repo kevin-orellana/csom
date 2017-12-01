@@ -809,7 +809,7 @@ void mm_checkheap(int lineno)
             }
             else{
                 // if size is in other size ranges (0-18)
-                if(!(GET_SIZE(HDRP(bp))/WSIZE < (size_t) (1<<(i+3))))
+                if(!(GET_SIZE(HDRP(bp))/WSIZE < (size_t) (1<<(i+4))))
                 {
                     dbg_printf("block is in wrong index (too small)\n");
                     exit(1);
