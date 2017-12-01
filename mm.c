@@ -1,36 +1,28 @@
-/* mm seg description */
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <assert.h>
 #include <unistd.h>
+#include <string.h> //
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "mm.h"
 #include "memlib.h"
-team_t team = {
-        /* Team name */
-        "ZuiHaoZueSheng",
-        /* First member's full name */
-        "Kevin Orellana",
-        /* First member's github username*/
-        " kevin-orellana",
-        /* Second member's full name (leave blank if none) */
-        "Anthony Schalhoub",
-        /* Second member's github username (leave blank if none) */
-        " hkjs"
-};
 
 
-/* single word (4) or double word (8) alignment */
-//#define ALIGNMENT   (8)
+#include <stdbool.h>
+#include <stdint.h>
+
 #define WSIZE       (sizeof(void*))
 #define DSIZE       (2 * WSIZE)
 #define MINSIZE     (2 * DSIZE)
-#define CHUNKSIZE   (1 << 12)
+#define CHUNKSIZE   (1<<12)
 
 /* gets the value that's larger from x and y */
-#define MAX(x, y)           ((x) > (y)? (x) : (y))
-#define MIN(x, y)           ((x) < (y)? (x) : (y))
+#define MAX(x, y)   ((x) > (y)? (x) : (y))
+#define MIN(x, y)   ((x) < (y)? (x) : (y))
 
 /* rounds up to the nearest multiple of ALIGNMENT */
 //#define ALIGN(p)            (((size_t)(p) + (ALIGNMENT-1)) & ~0x7)
@@ -39,6 +31,8 @@ team_t team = {
 #define PACK(size, allocated_bit)   ((size) | (allocated_bit))
 
 /* Read and write a word at address p */
+//#define GET(p)              (*(uintptr_t *)(p))
+//#define PUT(p, val)         (*(uintptr_t *)(p) = (val))
 #define GET(p)              (*(unsigned long *)(p))
 #define PUT(p, val)         (*(unsigned long *)(p) = (val))
 

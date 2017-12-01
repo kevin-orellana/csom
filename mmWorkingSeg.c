@@ -32,11 +32,13 @@
 #define PACK(size, allocated_bit)   ((size) | (allocated_bit))
 
 /* Read and write a word at address p */
-#define GET(p)              (*(uintptr_t *)(p))
-#define PUT(p, val)         (*(uintptr_t *)(p) = (val))
+//#define GET(p)              (*(uintptr_t *)(p))
+//#define PUT(p, val)         (*(uintptr_t *)(p) = (val))
+#define GET(p)              (*(unsigned long *)(p))
+#define PUT(p, val)         (*(unsigned long *)(p) = (val))
 
 /* Set the memory in address location P1 to be the address of P2 */
-#define SET(P1, P2)          (*(uintptr_t *)(P1) = (uintptr_t)(P2))
+#define SET(P1, P2)          (*(unsigned long *)(P1) = (unsigned long)(P2))
 
 /* Read the size and allocated fields from address p */
 #define GET_SIZE(p)         (GET(p) & ~(DSIZE - 1))
