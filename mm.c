@@ -34,7 +34,7 @@ team_t team = {
 int mm_init(void);
 void *mm_malloc(size_t size);
 void mm_free(void *ptr);
-void *mm_realloc(void *ptr, size_t size);
+void *mm_realloc(void *oldptr, size_t size);
 void mm_checkheap(int verbose);
 
 /* function helpers */
@@ -48,20 +48,20 @@ static void removeBlock(void* bp);
 /* debugging functions */
 static int in_heap(const void *p);
 static int aligned(const void *p);
+void mm_checkheap(int lineno);
 
-/* End program function overview */
-
- /* Describe the macros used and reference them to Bryant 2002 */
+/* End Function Prototypes */
 
 # define dbg_printf(...) printf(__VA_ARGS__)
 
-#define WSIZE       (8)
-#define DSIZE       (8)
+#define WSIZE       (sizeof(void*))
+#define DSIZE       (2 * WSIZE)
 #define MINSIZE     (2 * DSIZE)
 #define CHUNKSIZE   (1<<12)
 
 /* gets the value that's larger from x and y */
 #define MAX(x, y)   ((x) > (y)? (x) : (y))
+#define MIN(x, y)   ((x) < (y)? (x) : (y))
 
 /* packs together a size and an allocate bit into val ot put in header */
 #define PACK(size, allocated_bit)   ((size) | (allocated_bit))
@@ -86,21 +86,21 @@ static int aligned(const void *p);
 #define PREV_BLKP(bp)       ((char *)(bp) - GET_SIZE(((char *)(bp) - DSIZE)))
 
 /*Given block ptr bp, compute address of the location of the next/prev ptr in
-  list. DESCRIBE/CHANGE THIS. */
+  list */
 #define NEXT_LSTP(bp)       ((char*) (bp) + WSIZE)
 #define PREV_LSTP(bp)       ((char*) (bp))
 
-/*Given address to next location, derefernece it. DESCRIBE/CHANGE THIS. */
+/*Given address to next location, derefernece it */
 #define DREF_NP(bp)          (*(char**) NEXT_LSTP(bp))
 #define DREF_PP(bp)          (*(char**) PREV_LSTP(bp))
 
 /* DEBUG MODE */
 #define DEBUGMODE            0  // 0 is off, 1 is on
 
-/* GLOBAL VARIABLES DESCRIBE THEM */
+/* GLOBAL VARIABLES */
 char* heapStart;
 char** tableStart;
-/*BEGIN */
+
 
 /*============================================================================*/
 //                                  mm_init                                   //
@@ -527,7 +527,7 @@ void mm_free (void *bp)
 //   the address of this new block. The contents of the new block are the same//
 //   as those of the old ptr block, up to the minimum of the old and new sizes//
 /*============================================================================*/
-void *mm_realloc(void *ptr, size_t size)
+void *mm_realloc(void *oldptr, size_t size)
 {
     size_t oldsize;
     size_t nextsize;
