@@ -24,9 +24,9 @@ team_t team = {
 /* single word (4) or double word (8) alignment */
 //#define ALIGNMENT   (8)
 #define WSIZE       (sizeof(void*))
-#define DSIZE       (2*WSIZE)
-#define MINSIZE     (2*DSIZE)
-#define CHUNKSIZE   (1<<8)
+#define DSIZE       (2 * WSIZE)
+#define MINSIZE     (2 * DSIZE)
+#define CHUNKSIZE   (1 << 12)
 
 /* gets the value that's larger from x and y */
 #define MAX(x, y)           ((x) > (y)? (x) : (y))
@@ -36,7 +36,7 @@ team_t team = {
 //#define ALIGN(p)            (((size_t)(p) + (ALIGNMENT-1)) & ~0x7)
 
 /* packs together a size and an allocate bit into val ot put in header */
-#define PACK(s,a)           ((s) | (a))
+#define PACK(size, allocated_bit)   ((size) | (allocated_bit))
 
 /* Read and write a word at address p */
 #define GET(p)              (*(unsigned long *)(p))
@@ -46,7 +46,7 @@ team_t team = {
 #define SET(P1, P2)          (*(unsigned long *)(P1) = (unsigned long)(P2))
 
 /* Read the size and allocated fields from address p */
-#define GET_SIZE(p)         (GET(p) & ~0x7)
+#define GET_SIZE(p)         (GET(p) & ~(DSIZE - 1))
 #define GET_ALLOC(p)        (GET(p) & 0x1)
 
 /* given block pointer bp, compute the address of the header/footer */
