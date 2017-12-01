@@ -704,10 +704,10 @@ void mm_checkheap(int lineno)
             exit(1);
         }
         // Check if the pointer is aligned.
-        if(!aligned(bp)){
-            dbg_printf("pointer is not aligned.\n");
-            exit(1);
-        }
+//        if(!aligned(bp)){
+//            dbg_printf("pointer is not aligned.\n");
+//            exit(1);
+//        }
         // Check for minimum size
         if(frontSize <= DSIZE && frontSize != 0){
             dbg_printf("block less than minimum size\n");
