@@ -28,16 +28,16 @@ team_t team = {
 };
 
 /* Describe the functions you'll use in the implementation
- * Categorize them as "original, seg-list implementation helpers and debugging" */
+ * Categorize them as "original, seg-list implementation helpers and debugging" change this */
 
 /* Original Functions */
 int mm_init(void);
 void *mm_malloc(size_t size);
 void mm_free(void *ptr);
-void *mm_realloc(void *oldptr, size_t size);
+void *mm_realloc(void *ptr, size_t size);
 void mm_checkheap(int verbose);
 
-/* function helpers */
+/* function helpers change this */
 static void *coalesce(void* bp);
 static void *extend_heap(size_t words);
 static void *find_fit(size_t size);
@@ -527,7 +527,7 @@ void mm_free (void *bp)
 //   the address of this new block. The contents of the new block are the same//
 //   as those of the old ptr block, up to the minimum of the old and new sizes//
 /*============================================================================*/
-void *mm_realloc(void *oldptr, size_t size)
+void *mm_realloc(void *ptr, size_t size)
 {
     size_t oldsize;
     size_t nextsize;
@@ -535,11 +535,11 @@ void *mm_realloc(void *oldptr, size_t size)
 
     // if size == 0, it means just free the pointer
     if(size == 0){
-        mm_free(oldptr);
+        mm_free(ptr);
         return 0;
     }
     // if pointer is NULL, just malloc the size
-    if (oldptr == NULL){
+    if (ptr == NULL){
         return mm_malloc(size);
     }
 
@@ -554,26 +554,26 @@ void *mm_realloc(void *oldptr, size_t size)
     }
 
     // get the size of the old block
-    oldsize = GET_SIZE(HDRP(oldptr));
+    oldsize = GET_SIZE(HDRP(ptr));
     //if the current size can fit into the oldblock, put it in.
     if(size < oldsize) {
-        PUT(HDRP(oldptr), PACK(oldsize, 1));
-        PUT(FTRP(oldptr), PACK(oldsize, 1));
-        return oldptr;
+        PUT(HDRP(ptr), PACK(oldsize, 1));
+        PUT(FTRP(ptr), PACK(oldsize, 1));
+        return ptr;
     }
         // if adding the next block makes the new size fit
-    else if(size - oldsize < (nextsize = GET_SIZE(NEXT_BLKP(oldptr)))){
+    else if(size - oldsize < (nextsize = GET_SIZE(NEXT_BLKP(ptr)))){
         // if the next block is not allocated, merge them.
         // else just leave the block alone.
-        if(!GET_ALLOC(NEXT_BLKP(oldptr)) && !GET_SIZE(NEXT_BLKP(oldptr))){
+        if(!GET_ALLOC(NEXT_BLKP(ptr)) && !GET_SIZE(NEXT_BLKP(ptr))){
             // add the size together
             oldsize += nextsize;
             // remove the old block from free list
-            removeBlock(NEXT_BLKP(oldptr));
+            removeBlock(NEXT_BLKP(ptr));
             // put new header/footers on block.
-            PUT(HDRP(oldptr), PACK(oldsize,1));
-            PUT(FTRP(oldptr), PACK(oldsize,1));
-            return oldptr;
+            PUT(HDRP(ptr), PACK(oldsize,1));
+            PUT(FTRP(ptr), PACK(oldsize,1));
+            return ptr;
         }
     }
 
@@ -585,9 +585,9 @@ void *mm_realloc(void *oldptr, size_t size)
         return NULL;
     }
     // else copy all the previous memory to the new block.
-    memcpy(newptr, oldptr, oldsize);
+    memcpy(newptr, ptr, oldsize);
     // free the old block to be used later.
-    mm_free(oldptr);
+    mm_free(ptr);
     return newptr;
 }
 
