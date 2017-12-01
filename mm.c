@@ -588,9 +588,9 @@ void *mm_realloc(void *ptr, size_t size)
         return NULL;
     }
     // else copy all the previous memory to the new block.
-    memcpy(newptr, oldptr, oldsize);
+    memcpy(newptr, ptr, oldsize);
     // free the old block to be used later.
-    mm_free(oldptr);
+    mm_free(ptr);
     return newptr;
 }
 
