@@ -100,8 +100,7 @@ static int aligned(const void *p);
 /* GLOBAL VARIABLES DESCRIBE THEM */
 char* heapStart;
 char** tableStart;
-
-/*BEGIN WRITING FUNCTIONS*/
+/*BEGIN */
 
 /*============================================================================*/
 //                                  mm_init                                   //
@@ -144,56 +143,6 @@ int mm_init(void)
 
     return 0;
 }
-
-/*============================================================================*/
-//                                  malloc                                    //
-//----------------------------------------------------------------------------//
-// The malloc routine returns a pointer to an allocated block payload of at   //
-// least size bytes. The entire allocated block should lie within the heap    //
-// region and should not overlap with any other allocated chunk. Malloc       //
-// always returns an 8-byte aligned pointer.                                  //
-/*============================================================================*/
-void *mm_malloc (size_t size)
-{
-    char* bp = NULL;
-    size_t asize;
-    size_t extension;
-
-    // ignore extraneous requests.
-    if (size == 0)
-        return NULL;
-
-    // if the size is less than DSIZE, just make it standard size MINSIZE
-    if(size <= DSIZE){
-        asize = MINSIZE;
-    }
-        // if size is large enough, add DSIZE and then round it to the nearest
-        // DSIZE multiple
-    else {
-        asize = DSIZE * ((size + (DSIZE) + (DSIZE - 1)) / DSIZE);
-    }
-
-    // search for the size in the seg free list. If there is one, place the
-    // block into the free list.
-    if((bp = find_fit(asize)) != NULL){
-        place(bp, asize);
-        return bp;
-    }
-    // else extend the size by asize or chunksize, whichever is larger
-    // to avoid having to calculate extra information.
-    extension = MAX(asize, CHUNKSIZE);
-
-    // extend heap since there arent enough free blocks in the free list.
-    // extend by the extension.
-    if((bp = extend_heap(extension/WSIZE)) == NULL){
-        return NULL;
-    }
-    // Next, place the block into the newly allocated memory.
-    place(bp, asize);
-
-    return bp;
-}
-
 
 /*============================================================================*/
 //                                 coalesce                                   //
@@ -489,6 +438,54 @@ static void place(void* bp, size_t asize)
     }
 }
 
+/*============================================================================*/
+//                                  malloc                                    //
+//----------------------------------------------------------------------------//
+// The malloc routine returns a pointer to an allocated block payload of at   //
+// least size bytes. The entire allocated block should lie within the heap    //
+// region and should not overlap with any other allocated chunk. Malloc       //
+// always returns an 8-byte aligned pointer.                                  //
+/*============================================================================*/
+void *mm_malloc (size_t size)
+{
+    char* bp = NULL;
+    size_t asize;
+    size_t extension;
+
+    // ignore extraneous requests.
+    if (size == 0)
+        return NULL;
+
+    // if the size is less than DSIZE, just make it standard size MINSIZE
+    if(size <= DSIZE){
+        asize = MINSIZE;
+    }
+        // if size is large enough, add DSIZE and then round it to the nearest
+        // DSIZE multiple
+    else {
+        asize = DSIZE * ((size + (DSIZE) + (DSIZE - 1)) / DSIZE);
+    }
+
+    // search for the size in the seg free list. If there is one, place the
+    // block into the free list.
+    if((bp = find_fit(asize)) != NULL){
+        place(bp, asize);
+        return bp;
+    }
+    // else extend the size by asize or chunksize, whichever is larger
+    // to avoid having to calculate extra information.
+    extension = MAX(asize, CHUNKSIZE);
+
+    // extend heap since there arent enough free blocks in the free list.
+    // extend by the extension.
+    if((bp = extend_heap(extension/WSIZE)) == NULL){
+        return NULL;
+    }
+    // Next, place the block into the newly allocated memory.
+    place(bp, asize);
+
+    return bp;
+}
 
 /*============================================================================*/
 //                                  free                                      //
@@ -538,11 +535,11 @@ void *mm_realloc(void *ptr, size_t size)
 
     // if size == 0, it means just free the pointer
     if(size == 0){
-        mm_free(ptr);
+        mm_free(oldptr);
         return 0;
     }
     // if pointer is NULL, just malloc the size
-    if (ptr == NULL){
+    if (oldptr == NULL){
         return mm_malloc(size);
     }
 
@@ -557,26 +554,26 @@ void *mm_realloc(void *ptr, size_t size)
     }
 
     // get the size of the old block
-    oldsize = GET_SIZE(HDRP(ptr));
+    oldsize = GET_SIZE(HDRP(oldptr));
     //if the current size can fit into the oldblock, put it in.
     if(size < oldsize) {
-        PUT(HDRP(ptr), PACK(oldsize, 1));
-        PUT(FTRP(ptr), PACK(oldsize, 1));
-        return ptr;
+        PUT(HDRP(oldptr), PACK(oldsize, 1));
+        PUT(FTRP(oldptr), PACK(oldsize, 1));
+        return oldptr;
     }
         // if adding the next block makes the new size fit
-    else if(size - oldsize < (nextsize = GET_SIZE(NEXT_BLKP(ptr)))){
+    else if(size - oldsize < (nextsize = GET_SIZE(NEXT_BLKP(oldptr)))){
         // if the next block is not allocated, merge them.
         // else just leave the block alone.
-        if(!GET_ALLOC(NEXT_BLKP(ptr)) && !GET_SIZE(NEXT_BLKP(ptr))){
+        if(!GET_ALLOC(NEXT_BLKP(oldptr)) && !GET_SIZE(NEXT_BLKP(oldptr))){
             // add the size together
             oldsize += nextsize;
             // remove the old block from free list
-            removeBlock(NEXT_BLKP(ptr));
+            removeBlock(NEXT_BLKP(oldptr));
             // put new header/footers on block.
-            PUT(HDRP(ptr), PACK(oldsize,1));
-            PUT(FTRP(ptr), PACK(oldsize,1));
-            return ptr;
+            PUT(HDRP(oldptr), PACK(oldsize,1));
+            PUT(FTRP(oldptr), PACK(oldsize,1));
+            return oldptr;
         }
     }
 
@@ -588,9 +585,9 @@ void *mm_realloc(void *ptr, size_t size)
         return NULL;
     }
     // else copy all the previous memory to the new block.
-    memcpy(newptr, ptr, oldsize);
+    memcpy(newptr, oldptr, oldsize);
     // free the old block to be used later.
-    mm_free(ptr);
+    mm_free(oldptr);
     return newptr;
 }
 
