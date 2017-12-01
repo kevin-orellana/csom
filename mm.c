@@ -20,17 +20,10 @@ team_t team = {
         " hkjs"
 };
 
-/* If you want debugging output, use the following macro.  When you hand
- * in, remove the #define DEBUG line. */
-#define DEBUG
-# define dbg_printf(...) printf(__VA_ARGS__)
-#else
-# define dbg_printf(...)
-#endif
 
 /* single word (4) or double word (8) alignment */
-#define ALIGNMENT   (8)
-#define WSIZE       ALIGNMENT
+//#define ALIGNMENT   (8)
+#define WSIZE       (sizeof(void*))
 #define DSIZE       (2*WSIZE)
 #define MINSIZE     (2*DSIZE)
 #define CHUNKSIZE   (1<<8)
@@ -40,7 +33,7 @@ team_t team = {
 #define MIN(x, y)           ((x) < (y)? (x) : (y))
 
 /* rounds up to the nearest multiple of ALIGNMENT */
-#define ALIGN(p)            (((size_t)(p) + (ALIGNMENT-1)) & ~0x7)
+//#define ALIGN(p)            (((size_t)(p) + (ALIGNMENT-1)) & ~0x7)
 
 /* packs together a size and an allocate bit into val ot put in header */
 #define PACK(s,a)           ((s) | (a))
