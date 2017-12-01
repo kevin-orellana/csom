@@ -98,8 +98,8 @@ static int aligned(const void *p);
 /* DEBUG MODE DELETE THIS EVENTUALLY*/
 #define DEBUGMODE            0  // 0 is off, 1 is on
 
-/* GLOBAL VARIABLES DESCRIBE THIS */
-char* heapStart;
+/* GLOBAL VARIABLES. DESCRIBE THIS */
+char* heap_pointer;
 char** tableStart;
 
 
@@ -253,7 +253,7 @@ int size_class(size_t size)
     // size of blocks are split into powers of 2 up to 2^21, which anything
     // over that number of blocks goes into the last free list (19).
     for(int i = 0; i < 19; i++){
-        if(blocks < (1<<(i+3)))
+        if(blocks < (1<<(i+4)))
             return i;
     }
     return 19;
