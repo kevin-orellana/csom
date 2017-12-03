@@ -37,8 +37,7 @@ set(SOURCE_FILES
         memlib.c
         memlib.h
         memlib.o
-        mmSEGOurs.c
         mm.h
-        mm.o try.c backup.cpp backup.c tests.c NEW.c)
+        mm.o)
 
 add_executable(lab4 ${SOURCE_FILES})

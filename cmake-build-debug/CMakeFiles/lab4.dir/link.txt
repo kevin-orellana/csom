@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/lab4.dir/clock.c.o CMakeFiles/lab4.dir/fcyc.c.o CMakeFiles/lab4.dir/fsecs.c.o CMakeFiles/lab4.dir/ftimer.c.o CMakeFiles/lab4.dir/mdriver.c.o CMakeFiles/lab4.dir/memlib.c.o ../clock.o ../fcyc.o ../fsecs.o ../ftimer.o ../mdriver.o ../memlib.o ../mm.o  -o lab4 

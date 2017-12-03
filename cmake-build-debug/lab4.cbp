@@ -8,79 +8,188 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/Users/ko/Google Drive/Fall &apos;17/CSO/csom/cmake-build-debug"/>
+				<Option working_dir="/home/cso17/cso/csom/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/Users/ko/Google Drive/Fall &apos;17/CSO/csom/cmake-build-debug"/>
+				<Option working_dir="/home/cso17/cso/csom/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/Users/ko/Google Drive/Fall &apos;17/CSO/csom/cmake-build-debug"/>
+				<Option working_dir="/home/cso17/cso/csom/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="lab4">
-				<Option output="/Users/ko/Google Drive/Fall &apos;17/CSO/csom/cmake-build-debug/lab4" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/Users/ko/Google Drive/Fall &apos;17/CSO/csom/cmake-build-debug"/>
+				<Option output="/home/cso17/cso/csom/cmake-build-debug/lab4" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/cso17/cso/csom/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
-					<Add directory="/System/Library/Frameworks"/>
-					<Add directory="/Library/Frameworks"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 lab4"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 lab4"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="lab4/fast">
-				<Option output="/Users/ko/Google Drive/Fall &apos;17/CSO/csom/cmake-build-debug/lab4" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/Users/ko/Google Drive/Fall &apos;17/CSO/csom/cmake-build-debug"/>
+				<Option output="/home/cso17/cso/csom/cmake-build-debug/lab4" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/cso17/cso/csom/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/9.0.0/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
-					<Add directory="/System/Library/Frameworks"/>
-					<Add directory="/Library/Frameworks"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 lab4/fast"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/ko/Google\ Drive/Fall\ &apos;17/CSO/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 lab4/fast"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/cso17/cso/csom/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/Users/ko/Google Drive/Fall &apos;17/CSO/csom/CMakeLists.txt">
+		<Unit filename="/home/cso17/cso/csom/Makefile">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/clock.c">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/clock.h">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/clock.o">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/config.h">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/fcyc.c">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/fcyc.h">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/fcyc.o">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/fsecs.c">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/fsecs.h">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/fsecs.o">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/ftimer.c">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/ftimer.h">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/ftimer.o">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/mdriver">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/mdriver.c">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/mdriver.o">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/memlib.c">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/memlib.h">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/memlib.o">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/mm.h">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/mm.o">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/amptjp-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/binary-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/binary2-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/cccp-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/coalescing-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/cp-decl-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/expr-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/random-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/random2-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/realloc-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/realloc2-bal.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/short1.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/traces/short2.rep">
+			<Option target="lab4"/>
+		</Unit>
+		<Unit filename="/home/cso17/cso/csom/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>
