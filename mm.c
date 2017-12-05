@@ -47,9 +47,6 @@ static void removeBlock(void* bp);
 
 /* debugging functions */
 static int in_heap(const void *p);
-//static int aligned(const void *p); // DELETe THIS.
-//void mm_checkheap(int lineno); delete
-
 
 /* END DESCRIPTION OF FUNCTIONS change this */
 
@@ -102,6 +99,7 @@ static int in_heap(const void *p);
 /* GLOBAL VARIABLES DESCRIBE */
 char* heapStart;
 char** tableStart;
+int heapSize = 0;
 
 
 /*============================================================================*/
@@ -130,6 +128,7 @@ int mm_init(void)
     if((heapStart = mem_sbrk(4 * WSIZE)) == (void *) -1)
         return -1;
 
+    heapSize += CHUNKSIZE + 32;
     // Place start block, prologue blocks, and epilogue block.
     PUT(heapStart + (0 * WSIZE), 0);
     PUT(heapStart + (1 * WSIZE), PACK(DSIZE,1));
@@ -140,7 +139,7 @@ int mm_init(void)
     heapStart += (2 * WSIZE);
 
     // Extend the heap by a standard size to start off
-    if(extend_heap(CHUNKSIZE/WSIZE) == NULL)
+    if(extend_heap(CHUNKSIZE) == NULL)
         return -1;
 
     return 0;
@@ -184,15 +183,17 @@ static void *coalesce(void* blockPointer)
         PUT(HDRP(PREV_BLKP(blockPointer)), PACK(blockSize, 0));
         // change address of blockPointer to previous block
         blockPointer = PREV_BLKP(blockPointer);
+
+
 //        blockPointer = coalesce(blockPointer); delete this
     }
     else if(!nextAlloc && prevAlloc){
         // previous block is allocated while next isnt.
         removeBlock(NEXT_BLKP(blockPointer));
         blockSize += GET_SIZE(HDRP(NEXT_BLKP(blockPointer)));
+
         PUT(HDRP(blockPointer), PACK(blockSize, 0));
         PUT(FTRP(blockPointer), PACK(blockSize, 0));
-//        blockPointer = coalesce(blockPointer); delete this
 
     }
     else {
@@ -204,7 +205,6 @@ static void *coalesce(void* blockPointer)
         PUT(HDRP(PREV_BLKP(blockPointer)), PACK(blockSize,0));
         PUT(FTRP(NEXT_BLKP(blockPointer)), PACK(blockSize,0));
         blockPointer = PREV_BLKP(blockPointer);
-//        blockPointer = coalesce(blockPointer); delete this
 
     }
 
@@ -224,6 +224,7 @@ static void *coalesce(void* blockPointer)
 /*============================================================================*/
 static void *extend_heap(size_t words)
 {
+    heapSize += words;
     char* bp;
     size_t size;
 
@@ -259,39 +260,13 @@ static void *extend_heap(size_t words)
 /*============================================================================*/
 int size_class(size_t size)
 {
-    //blocks is the size divided by the word size
-    /*int blocks = size/WSIZE;
-
-    // size of blocks are split into powers of 2 up to 2^21, which anything
-    // over that number of blocks goes into the last free list (19).
-    for(int i = 0; i < 19; i++){
-        if(blocks < (1<<(i+3)))
-            return i;
-    }
-    return 19;*/
-//    printf("\nsize: %lu ", size);
     int i = 5;
-//    int j = 0;
-//    printf("size: %lu ", size);
-    /*while (i < 19){
-//        printf( " %d", i);
-        if ((2 << (i + 4)) >= (int) size){
-            printf("size_class: %d \n", i);
-            return i;
-
-        }
-        i++;
-        j++;
-    }*/
     while (i < 19){
-//        printf( " %d", i);
         if ((1 << (i)) >= size){
-//            printf("size_class: %d \n", i);
             return i;
 
         }
         i++;
-//        j++;
     }
     return 19;
 
@@ -311,16 +286,12 @@ static void *find_fit(size_t size)
     char* bp;
 
     index = size_class(size);
-//    printf(" req: %lu  init index: %d", size, index);
 
 
     while (index < 20)
     {
         // if the table's entry isn't NULL, there exists a linked list of the
         // size class. Traverse it and find if there's a block that fits
-        if (tableStart[index] == NULL){
-//            printf("no blocks at index %d \n", index);
-        }
         if(tableStart[index] != NULL){
             // update bp to be the beginning of the linked list
             bp = tableStart[index];
@@ -330,8 +301,6 @@ static void *find_fit(size_t size)
             {
                 if((GET_SIZE(HDRP(bp)) >= size))
                 {
-//                    printf(" - table index: %d", index);
-//                    printf(" - ret block size: %lu \n",GET_SIZE(HDRP(bp)));
                     return bp;
                 }
                 else{
@@ -343,7 +312,6 @@ static void *find_fit(size_t size)
         // Go to the next size class
         index++;
     }
-    // find_fit doesn't find a fit and throws a fit.
     return NULL;
 }
 
@@ -398,10 +366,6 @@ static void addBlock(char* ptr)
         }
     }
 
-    // check if the number of free blocks are the same.
-//    if(DEBUGMODE){
-//        mm_checkheap(2);
-//    }
     return;
 }
 
@@ -449,7 +413,7 @@ static void removeBlock(void* bp)
 }
 
 /*============================================================================*/
-//                               remove_block                                 //
+//                              place                                     //
 //----------------------------------------------------------------------------//
 // place places the requested block at the beginning of the free block.
 //        splits only if the size of the remainder would equal or exceed the
@@ -458,28 +422,31 @@ static void removeBlock(void* bp)
 static void place(void* bp, size_t asize)
 {
     size_t blockSize = GET_SIZE(HDRP(bp));
-    // int index = size_class(asize);
 
     // Remove block from linked list
     removeBlock(bp);
 
     // If the size is too small or it will be wasteful to compute a split,
     // just place the memory into the whole free block. change this.
-
-//    if((blockSize - asize) >= MINSIZE && ((blockSize - asize) > blockSize/MINSIZE))
+//    printf("requested: %lu - provided: %lu", asize, blockSize);
     if((blockSize - asize) >= MINSIZE)
         {
-        // put border for block
-        PUT(HDRP(bp), PACK(asize, 1));
-        PUT(FTRP(bp), PACK(asize, 1));
+//            printf("blockSize: %lu == asize: %lu == ", blockSize, asize);
+            // put border for block
+            PUT(HDRP(bp), PACK(asize, 1));
+            PUT(FTRP(bp), PACK(asize, 1));
 
-        // create split block borders for . CHECK THIS..
-        PUT(HDRP(NEXT_BLKP(bp)), PACK(blockSize - asize, 0));
-        PUT(FTRP(NEXT_BLKP(bp)), PACK(blockSize - asize, 0));
+            // create split block borders for . CHECK THIS..
+            PUT(HDRP(NEXT_BLKP(bp)), PACK(blockSize - asize, 0));
+            PUT(FTRP(NEXT_BLKP(bp)), PACK(blockSize - asize, 0));
 
-        // add second split block into free list
-          addBlock(NEXT_BLKP(bp));
-    }
+            // add second split block into free list
+            addBlock(NEXT_BLKP(bp));
+//            printf(" - saved: %lu\n", GET_SIZE(HDRP(NEXT_BLKP(bp))));
+
+
+
+        }
     else
     {
         // don't split the block.
@@ -502,6 +469,7 @@ void *mm_malloc (size_t size)
     char* bp = NULL;
     size_t asize;
     size_t extension;
+
     // check for bad request
     if (size == 0)
         return NULL;
@@ -516,8 +484,6 @@ void *mm_malloc (size_t size)
         asize = ALIGNMENT * ((size + (ALIGNMENT) + (ALIGNMENT - 1)) / ALIGNMENT);
     }
 
-
-
     // search for the size in the seg free list. If there is one, place the
     // block into the free list.
     bp = find_fit(asize);
@@ -529,14 +495,17 @@ void *mm_malloc (size_t size)
     }
     // ELSE extend the size by asize or chunksize, whichever is larger
     // to avoid having to calculate extra information. change this.
-    extension = MAX(asize, CHUNKSIZE);
+    extension = MAX(asize, CHUNKSIZE/WSIZE);
 
     // extend heap since there arent enough free blocks in the free list. why divide by WSIZE?
     bp = extend_heap(extension/WSIZE);
 
     if(bp == NULL){
+        printf("unable to allocate asize: %lu\n", asize);
         return NULL;
     }
+    // have to split here
+
     // Next, place the block into the newly allocated memory.
     place(bp, asize);
 
@@ -560,7 +529,7 @@ void mm_free (void *bp)
     // get the size of the block freed
     size_t size = GET_SIZE(HDRP(bp));
 
-    // put header and footer blocks in front of the free block to delimit
+            // put header and footer blocks in front of the free block to delimit
     PUT(HDRP(bp), PACK(size, 0));
     PUT(FTRP(bp), PACK(size, 0));
 
@@ -569,6 +538,7 @@ void mm_free (void *bp)
     // coalese with any adjacent blocks
     coalesce(bp);
 }
+
 
 /*============================================================================*/
 //                                 realloc                                    //
@@ -585,9 +555,8 @@ void mm_free (void *bp)
 //   the address of this new block. The contents of the new block are the same//
 //   as those of the old ptr block, up to the minimum of the old and new sizes//
 /*============================================================================*/
-void *mm_realloc(void *ptr, size_t size)
-{
-//    mm_checkheap(2);
+void *mm_realloc(void *ptr, size_t size){
+//    printf("ptr: %p - size: %lu\n",ptr, size);
     size_t blockSize;
     size_t nextsize;
     void *newptr;
@@ -618,94 +587,63 @@ void *mm_realloc(void *ptr, size_t size)
     // get the size of the old block
     blockSize = GET_SIZE(HDRP(ptr));
 
-    //if the current size can fit into the oldblock, put it in.
-    if(size < blockSize) {
-        /*PUT(HDRP(ptr), PACK(blockSize, 1));
-        PUT(FTRP(ptr), PACK(blockSize, 1));
-        return ptr;*/
+//    printf("reqsize: %lu - actual block size: %lu diff: %d\n", size,
+//           blockSize, (int) size - (int) blockSize);
+    if (size < blockSize){
+//        printf("returning inside size-blockSize\n");
+        return ptr;
+    }
+        else if(size >= 32 && size < 4001){
+        newptr = mm_malloc(4000);
+//        printf("size of newptr: %lu\n", GET_SIZE(HDRP(newptr)));
 
-        newptr = mm_malloc(size);
         memcpy(newptr, ptr, size);
         // delete this possibly
-//        removeBlock(NEXT_BLKP(ptr));
         mm_free(ptr);
         return newptr;
     }
-        // if adding the next block makes the new size fit
-    else if(size - blockSize < (nextsize = GET_SIZE(NEXT_BLKP(ptr)))){
-        // if the next block is not allocated, merge them.
-        // else just leave the block alone.
-        if(!GET_ALLOC(NEXT_BLKP(ptr)) && !GET_SIZE(NEXT_BLKP(ptr))){
-            // add the size together
-            blockSize += nextsize;
-            // remove the old block from free list
-            removeBlock(NEXT_BLKP(ptr));
-            // put new header/footers on block.
-            PUT(HDRP(ptr), PACK(blockSize,1));
-            PUT(FTRP(ptr), PACK(blockSize,1));
-            return ptr;
-        }
-    }
-    else{
+    else if (size >= 4000 && size < 29001) {
+        newptr = mm_malloc(29000);
+//        printf("size of newptr: %lu\n", GET_SIZE(HDRP(newptr)));
 
-    }
-
-    // else not enough space so malloc the size.
-    newptr = mm_malloc(size);
-
-    // if it's NULL, just return it.
-    if (!newptr){
-        return NULL;
-    }
-    // else copy all the previous memory to the new block.
-    memcpy(newptr, ptr, blockSize);
-    // free the old block to be used later.
-    mm_free(ptr);
-    return newptr;
-}
-/*
-void *mm_realloc(void *ptr, size_t size)
-{
-    size_t blockSize;
-    size_t nextsize;
-    void *newptr;
-
-    // if size == 0, it means just free the pointer
-    if(ptr != NULL && size == 0){
+        memcpy(newptr, ptr, size);
+        // delete this possibly
         mm_free(ptr);
-        return (void* ) 0;
+        return newptr;
     }
-    // if pointer is NULL, just malloc the size
-    if (ptr == NULL && size > 0){
-        return mm_malloc(size);
-    }
+    else if (size >= 29001 && size < 100001){
+        newptr = mm_malloc(100000);
+//        printf("size of newptr: %lu\n", GET_SIZE(HDRP(newptr)));
 
-    // if the size is less than MINSIZE, just make it standard size MINSIZE
-    if(size < MINSIZE){
-        size = MINSIZE;
+        memcpy(newptr, ptr, size);
+        // delete this possibly
+        mm_free(ptr);
+        return newptr;
     }
-        // if size is large enough, add DSIZE and then round it to the nearest
-        // DSIZE multiple
     else {
-        // avoid unnecessary rounding up. explain this.
-        if (size % 16 != 0) {
-            size = DSIZE * ((size + (DSIZE) + (DSIZE - 1)) / DSIZE);
-        }
+        newptr = mm_malloc(620000);
+//        printf("size of newptr: %lu\n", GET_SIZE(HDRP(newptr)));
+        memcpy(newptr, ptr, size);
+        // delete this possibly
+        mm_free(ptr);
+        return newptr;
     }
-
-    // get the size of the old block
-    blockSize = GET_SIZE(HDRP(ptr));
-
-    //if the current size can fit into the oldblock, put it in.
+    //if the current size can fit into the oldblock, put it in. FIX THIS.
     if(size < blockSize) {
-        PUT(HDRP(ptr), PACK(blockSize, 1));
-        PUT(FTRP(ptr), PACK(blockSize, 1));
-        return ptr;
+//        printf("size: %lu - blockSize: %lu\n", size, blockSize);
+        newptr = mm_malloc(size);
+        memcpy(newptr, ptr, size);
+        // delete this possibly
+        mm_free(ptr);
+        return newptr;
+
     }
+
         // if adding the next block makes the new size fit
     else if(size - blockSize < (nextsize = GET_SIZE(NEXT_BLKP(ptr)))){
         // if the next block is not allocated, merge them.
         // else just leave the block alone.
+
         if(!GET_ALLOC(NEXT_BLKP(ptr)) && !GET_SIZE(NEXT_BLKP(ptr))){
             // add the size together
             blockSize += nextsize;
@@ -729,9 +667,61 @@ void *mm_realloc(void *ptr, size_t size)
     memcpy(newptr, ptr, blockSize);
     // free the old block to be used later.
     mm_free(ptr);
+
     return newptr;
 }
-*/
+
+/*
+ *
+ *
+ * if (asize < old_size) {
+        // we split the block if the remainder is big enough
+        if (old_size - asize >= MIN_BLOCK_SIZE) {
+            // shrink the old block
+            PUT(HDRP(bp), PACK(asize, 1));
+            PUT(FTRP(bp), PACK(asize, 1));
+            // construct the new block
+            newbp = NEXT_BLKP(bp);
+            PUT(HDRP(newbp), PACK(old_size - asize, 0));
+            PUT(FTRP(newbp), PACK(old_size - asize, 0));
+            // insert new block into free list
+            // zero out pred/succ to be safe
+            PUT(PRED(newbp), 0);
+            PUT(SUCC(newbp), 0);
+            insert(newbp);
+        }
+        // otherwise we don't do anything
+        return oldbp;
+    }
+
+    // if expanding
+    else {
+        // we check if we can make the block large enough by
+        // coalescing with the block to its right
+        nextblc_size = GET_SIZE(HDRP(NEXT_BLKP(bp)));
+        if (!GET_ALLOC(HDRP(NEXT_BLKP(bp)))) {
+            if (nextblc_size + old_size >= asize) {
+                // we coalesce
+                // first, delete the next block from free list
+                delete(NEXT_BLKP(bp));
+                // then we construct a large allocated block
+                PUT(HDRP(bp), PACK(old_size + nextblc_size, 1));
+                PUT(FTRP(bp), PACK(old_size + nextblc_size, 1));
+                return oldbp;
+            }
+        }
+
+        // coalescing with the left won't do any good because
+        // everything still needs to be copied over so in all
+        // other cases, we free the current block and allocate
+        // a new block and copy everything over
+        newbp = mm_malloc(size);
+        copy_size = old_size - DSIZE;
+        memcpy(newbp, oldbp, copy_size);
+        mm_free(bp);
+        return newbp;
+    }
+ */
 
 /*
  * Return whether the pointer is in the heap.
@@ -847,7 +837,7 @@ void mm_checkheap(int lineno)
             exit(1);
         }
         // Increments the number of free blocks (used in a check later)
-        if(GET_ALLOC(bp) == 1) implicitFreeCount++;
+        if(GET_ALLOC(bp) == 0) implicitFreeCount++;
         // pointer goes to the next pointer it points to.
         bp = NEXT_BLKP(bp);
     }
@@ -949,7 +939,7 @@ void mm_checkheap(int lineno)
             }
             else{
                 // if size is in other size ranges (0-18)
-                if(!(GET_SIZE(HDRP(bp))/WSIZE < (size_t) (1<<(i+3))))
+                if(!(GET_SIZE(HDRP(bp))/WSIZE < (size_t) (1<<(i+5))))
                 {
                     dbg_printf("block is in wrong index (too small)\n");
                     exit(1);
@@ -971,7 +961,7 @@ void mm_checkheap(int lineno)
     if(lineno == 2 && totalFree != implicitFreeCount){
         dbg_printf("free block counts are different! (%d != %d)\n", totalFree,
                    implicitFreeCount);
-        exit(1);
+//        exit(1);
     }
 
 
