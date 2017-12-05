@@ -1,11 +1,56 @@
-/* mm seg description change this */
+/* NYU Computer Systems Organization Spring 2017
+ * Lab 4: Dynamic Memory Allocator
+ *
+ * Using a segregated free list implementation, this memory allocator
+ * maintains a list of 20 pointers to free blocks varying in sizes that
+ * increase by powers of 2.
+ *
+ * *first fit policy
+ *
+ * An allocated block has the following structure:
+ *
+ *        31  30  29  28  ..             0
+ *      +=================================+
+ *      | s   s   s   s   ...           1 | <-- Header: Note bits 31-1,
+ *      |=================================|     denoted 's', are used to
+ *      | 8888b.    db    888888    db    |     calculate size of block.
+ *      | 8I  Yb   dPYb     88     dPYb   |     The 0th bit indicates
+ *      | 8I  dY  dP__Yb    88    dP__Yb  |     whether the block is
+ *      | 8888Y" dP""""Yb   88   dP""""Yb |     free or allocated. 1
+ *      |                                 |     signals it is allocated.
+ *      |=================================|
+ *      | s   s   s   s   ...           1 | <-- Footer: shares same
+ *      +=================================+     attributes as header.
+ *
+ *      Note that overhead of the block is 8 + 8 = 16 (header plus footer)
+ *      and the minimum size of a block is 32.
+ *
+ *  A free block has the following structure:
+ *
+ *      +====================================+
+ *      | s   s   s   s   ...              0 | <-- Header: Note the 0th bit is 0 to
+ *      |====================================|    signal the block is free.
+ *      | PREVIOUS FREE BLOCK POINTER ADDRESS| <-- Pointer to previous free block
+ *      |====================================|
+ *      | NEXT FREE BLOCK POINTER ADDRESS    | <-- Pointer to next free block
+ *      |====================================|
+ *      |   8I  dY  dP__Yb    88    dP__Yb   |  <-- old data from previous use
+ *      |   8888Y" dP""""Yb   88   dP""""Yb  |     of the block.
+ *      |                                    |
+ *      |====================================|
+ *      | s   s   s   s   ...              0 | <-- Footer
+ *      +====================================+
+ *
+ *
+ *
+*/
 
+/* Supporting libraries */
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 #include "mm.h"
 #include "memlib.h"
 
@@ -16,7 +61,7 @@
 
 team_t team = {
      /* Team name */
-     "ZuiHaoXueSheng",
+     "最好学生",
      /* First member's full name */
      "Kevin Orellana",
      /* First member's github username*/
@@ -24,82 +69,84 @@ team_t team = {
      /* Second member's full name (leave blank if none) */
      "Anthony Schalhoub",
      /* Second member's github username (leave blank if none) */
-     "hkjs"
+     " hkajs"
 };
 
-/* Describe the functions you'll use in the implementation
- * Categorize them as "original, seg-list implementation helpers and debugging" change this */
+/* ====================     Function overview     ==================== */
 
-/* Original Functions */
+/* Memory Allocator Interface Functions */
 int mm_init(void);
 void *mm_malloc(size_t size);
 void mm_free(void *ptr);
 void *mm_realloc(void *ptr, size_t size);
 void mm_checkheap(int verbose);
 
-/* function helpers change this */
+/* Segregated List Implementation helper functions */
+static void *find_free_block(size_t size);
+static void allocate_block(void* bp);
+static void free_block(char* bp);
+static void split_block(void* bp, size_t asize);
 static void *coalesce(void* blockPointer);
-static void *extend_heap(size_t words);
-static void *find_fit(size_t size);
-static void place(void* bp, size_t asize);
-static void addBlock(char* bp);
-static void removeBlock(void* bp);
+static void *increase_heap(size_t words);
 
-/* debugging functions */
+/* mm_checkheap functions */
 static int in_heap(const void *p);
 
-/* END DESCRIPTION OF FUNCTIONS change this */
+/* ====================   End Function overview   ==================== */
 
-/* BEGIN DESCRIPTION OF MACROS */
-# define dbg_printf(...) printf(__VA_ARGS__)
 
-#define WSIZE       (8)  /* Word and header/footer size (bytes) */
-#define DSIZE       (16)  /* Double word size (bytes) */
-#define MINSIZE     (32)  /* Minimum size of block (bytes) */
-#define CHUNKSIZE   (1 << 8)  /* Extend heap by 256 amount (bytes) */
+/* ====================     Macro overview     ==================== */
+/* These macros are meant to reduce code clutter. Some of these macros may
+ * be found in Chapter 9: Virtual Memory; Computer Systems. Bryant, O'Hallaron. */
+#define WSIZE          (8)  /* Word and header/footer size (bytes) */
+#define DSIZE          (16)  /* Double word size (bytes) */
+#define MINSIZE        (32)  /* Minimum size of block (bytes) */
+#define CHUNKSIZE      (1 << 8)  /* Amount to extend heap by (bytes) */
 
-/* gets the value that's larger from x and y */
-#define MAX(x, y)   ((x) > (y)? (x) : (y))
+/* Returns the larger value of (x, y) */
+#define MAX(x, y)       ((x) > (y)? (x) : (y))
 
-/* packs together a size and an allocate bit into val ot put in header */
-#define PACK(size, bit)   ((size) | (bit))
+/* Pack a size (bit mask) and allocated bit into a word */
+#define PACK(size, allocated_bit)       ((size) | (allocated_bit))
 
 /* Read and write a word at address p */
-#define GET(p)              (*(unsigned long *)(p))
-#define PUT(p, val)         (*(unsigned long *)(p) = (val))
+#define GET(p)          (*(unsigned long *)(p))
+#define PUT(p, val)     (*(unsigned long *)(p) = (val))
 
 /* Set the memory in address location P1 to be the address of P2 */
-#define SET(P1, P2)          (*(unsigned long *)(P1) = (unsigned long)(P2))
+#define SET(P1, P2)     (*(unsigned long *)(P1) = (unsigned long)(P2))
 
-/* Read the size and allocated fields from address p */
-#define GET_SIZE(p) (GET(p) & ~0x7)
-#define GET_ALLOC(p)    (GET(p) & 0x1)
+/* Return size and allocated-bit of p block */
+#define GET_SIZE(bp)        (GET(bp) & ~0x7)
+#define GET_ALLOC(bp)       (GET(bp) & 0x1)
 
-/* given block pointer bp, compute the address of the header/footer */
-#define HDRP(bp)            ((char *) (bp) - WSIZE)
-#define FTRP(bp)            ((char *) (bp) + (GET_SIZE(HDRP(bp)) - DSIZE))
+/*Return address of next/previous bp block in free list */
+#define FREE_N_P(bp)        ((char*) (bp) + WSIZE)
+#define FREE_P_P(bp)        ((char*) (bp))
 
-/*Given block ptr bp, compute address of previous and next block */
+/*Return access to the next/previous free block */
+#define ACC_N_P(bp)     (*(char**) FREE_N_P(bp))
+#define ACC_P_P(bp)     (*(char**) FREE_P_P(bp))
+
+/* Return address of header/footer of bp block */
+#define HDRP(bp)        ((char *) (bp) - WSIZE)
+#define FTRP(bp)        ((char *) (bp) + (GET_SIZE(HDRP(bp)) - DSIZE))
+
+/*Return address of next/previous allocated bp block */
 #define NEXT_BLKP(bp)       ((char *)(bp) + GET_SIZE(((char *)(bp) - WSIZE)))
 #define PREV_BLKP(bp)       ((char *)(bp) - GET_SIZE(((char *)(bp) - DSIZE)))
 
 
-/*Given block ptr bp, compute address of the location of the next/prev ptr in
-  list CHANGE/DESCRIBE THIS */
-#define NEXT_LSTP(bp)       ((char*) (bp) + WSIZE)
-#define PREV_LSTP(bp)       ((char*) (bp))
 
-/*Given address to next location, derefernece it CHANGE/DESCRIBE THIS*/
-#define DREF_NP(bp)          (*(char**) NEXT_LSTP(bp))
-#define DREF_PP(bp)          (*(char**) PREV_LSTP(bp))
+/* ====================     End Macro overview     ==================== */
 
-/* DEBUG MODE DELETE THIS EVENTUALLY*/
-#define DEBUGMODE            0  // 0 is off, 1 is on
 
-/* GLOBAL VARIABLES DESCRIBE */
-char* heapStart;
-char** tableStart;
-int heapSize = 0;
+/* ====================     Global variables     ==================== */
+char* heap; // pointer to beginnining of heap
+char** freeList;  // pointer to start of free list
+int DEBUGMODE = 0; // set to 1 to debug
+
+/* ====================     End Global variables     ==================== */
 
 
 /*============================================================================*/
@@ -109,37 +156,37 @@ int heapSize = 0;
 // heap area. The return value should be -1 if there was a problem in         //
 // performing the initialization, 0 otherwise. Every time the driver executes //
 // a new trace, it resets your heap to the empty heap by calling your mm init //
-// function.                                                                  //
+// function.
+//
 /*============================================================================*/
 int mm_init(void)
 {
     // Allocate enough memory in beginning for 20 blocks of
     // space for linked list. NEEDED.
-    if((tableStart = mem_sbrk(20 * 8)) == (void *) -1)
+    if((freeList = mem_sbrk(20 * 8)) == (void *) -1)
         return -1;
 
 //     Initialize all entries for the linked list to be NULL. NEEDED.
     for(int i = 0; i < 20; i++){
-        tableStart[i] = NULL;
+        freeList[i] = NULL;
     }
 
     // Allocate enough memory for 4 blocks for epilogue, prologue
     // and beginning bits.
-    if((heapStart = mem_sbrk(4 * WSIZE)) == (void *) -1)
+    if((heap = mem_sbrk(4 * WSIZE)) == (void *) -1)
         return -1;
 
-    heapSize += CHUNKSIZE + 32;
     // Place start block, prologue blocks, and epilogue block.
-    PUT(heapStart + (0 * WSIZE), 0);
-    PUT(heapStart + (1 * WSIZE), PACK(DSIZE,1));
-    PUT(heapStart + (2 * WSIZE), PACK(DSIZE,1));
-    PUT(heapStart + (3 * WSIZE), PACK(0,1));
+    PUT(heap + (0 * WSIZE), 0);
+    PUT(heap + (1 * WSIZE), PACK(DSIZE,1));
+    PUT(heap + (2 * WSIZE), PACK(DSIZE,1));
+    PUT(heap + (3 * WSIZE), PACK(0,1));
 
     // Change the start of the heap to be where the prologue blocks are
-    heapStart += (2 * WSIZE);
+    heap += (2 * WSIZE);
 
     // Extend the heap by a standard size to start off
-    if(extend_heap(CHUNKSIZE) == NULL)
+    if(increase_heap(CHUNKSIZE) == NULL)
         return -1;
 
     return 0;
@@ -168,13 +215,13 @@ static void *coalesce(void* blockPointer)
     }
 
     // Removes the block since a new one will be added either way. CHANGE THIS.
-    removeBlock(blockPointer);
+    allocate_block(blockPointer);
 
     // Cases upon whether or not the next or previous blocks are allocated
     if(!prevAlloc && nextAlloc){
         // previous block isnt allocated while next is
         // remove previous block
-        removeBlock(PREV_BLKP(blockPointer));
+        allocate_block(PREV_BLKP(blockPointer));
         // add size of previous block to blockSize
         blockSize += GET_SIZE(HDRP(PREV_BLKP(blockPointer)));
         // mark blockPointer as Free
@@ -189,7 +236,7 @@ static void *coalesce(void* blockPointer)
     }
     else if(!nextAlloc && prevAlloc){
         // previous block is allocated while next isnt.
-        removeBlock(NEXT_BLKP(blockPointer));
+        allocate_block(NEXT_BLKP(blockPointer));
         blockSize += GET_SIZE(HDRP(NEXT_BLKP(blockPointer)));
 
         PUT(HDRP(blockPointer), PACK(blockSize, 0));
@@ -198,8 +245,8 @@ static void *coalesce(void* blockPointer)
     }
     else {
         // both previous and next blocks are allocated
-        removeBlock(PREV_BLKP(blockPointer));
-        removeBlock(NEXT_BLKP(blockPointer));
+        allocate_block(PREV_BLKP(blockPointer));
+        allocate_block(NEXT_BLKP(blockPointer));
         blockSize += GET_SIZE(HDRP(PREV_BLKP(blockPointer))) +
                 GET_SIZE(HDRP(NEXT_BLKP(blockPointer)));
         PUT(HDRP(PREV_BLKP(blockPointer)), PACK(blockSize,0));
@@ -209,22 +256,21 @@ static void *coalesce(void* blockPointer)
     }
 
     // Add the new coalesced block onto the linked list
-    addBlock(blockPointer);
+    free_block(blockPointer);
 
     return blockPointer;
 }
 
 /*============================================================================*/
-//                              extend_heap                                   //
+//                              increase_heap                                   //
 //----------------------------------------------------------------------------//
 // Takes a size and converts it into words to extend the heap by in the call  //
 // of mem_sbrk. The function then adds the header and footer for the new free //
 // block, and then moves the prologue block to the end. This block is then    //
 // added to the free list and coalesced with its neighboring blocks. EXPLAIN THIS. FOUND IN TEXTBOOK       //
 /*============================================================================*/
-static void *extend_heap(size_t words)
+static void *increase_heap(size_t words)
 {
-    heapSize += words;
     char* bp;
     size_t size;
 
@@ -247,7 +293,7 @@ static void *extend_heap(size_t words)
 
 
     // add this new block to the free list. change this.
-    addBlock(bp);
+    free_block(bp);
 
     // coalesce new block with adjacent free blocks.
     return coalesce(bp);
@@ -260,11 +306,10 @@ static void *extend_heap(size_t words)
 /*============================================================================*/
 int size_class(size_t size)
 {
-    int i = 5;
+    int i = 6;
     while (i < 19){
         if ((1 << (i)) >= size){
             return i;
-
         }
         i++;
     }
@@ -274,13 +319,13 @@ int size_class(size_t size)
 }
 
 /*============================================================================*/
-//                                 find_fit                                   //
+//                                 find_free_block                                   //
 //----------------------------------------------------------------------------//
-// find_fit finds a pointer from the segregated free list that suits the size //
+// find_free_block finds a pointer from the segregated free list that suits the size //
 // given. This is the first fit policy, that chooses the first block that     //
 // has a size larger than the size requested.                                 //
 /*============================================================================*/
-static void *find_fit(size_t size)
+static void *find_free_block(size_t size)
 {
     int index;
     char* bp;
@@ -292,9 +337,9 @@ static void *find_fit(size_t size)
     {
         // if the table's entry isn't NULL, there exists a linked list of the
         // size class. Traverse it and find if there's a block that fits
-        if(tableStart[index] != NULL){
+        if(freeList[index] != NULL){
             // update bp to be the beginning of the linked list
-            bp = tableStart[index];
+            bp = freeList[index];
 
             // traverse the linked list
             while(bp != NULL)
@@ -305,7 +350,7 @@ static void *find_fit(size_t size)
                 }
                 else{
                     // pointer is the next in the linked list
-                    bp = DREF_NP(bp);
+                    bp = ACC_N_P(bp);
                 }
             }
         }
@@ -323,46 +368,46 @@ static void *find_fit(size_t size)
 // operations to add the block into a position with regards to an increasing  //
 // size, and manipulating pointers to connect with the next block.            //
 /*============================================================================*/
-static void addBlock(char* ptr)
+static void free_block(char* ptr)
 {
     size_t asize = GET_SIZE(HDRP(ptr));  // Requested block's size
     int index = size_class(asize);       // Size class of req block
     char* nextPointer = NULL;            // Next pointer
-    char* bp = tableStart[index];        // Init bp = beginning of linked list
+    char* bp = freeList[index];        // Init bp = beginning of linked list
 
     // Find the location where the block's size fits into the linked list
     // that follows an increasing order.
     while((bp != NULL) && (asize > GET_SIZE(HDRP(bp)))){
         nextPointer = bp;
-        bp = DREF_NP(bp);
+        bp = ACC_N_P(bp);
     }
 
     // Determines where the block (end, beginning, middle) to manipulate the
     // pointers to change it to add the block.
     if(bp == NULL){
         if(nextPointer == NULL){
-            SET(NEXT_LSTP(ptr), NULL);
-            SET(PREV_LSTP(ptr), NULL);
-            tableStart[index] = ptr;
+            SET(FREE_N_P(ptr), NULL);
+            SET(FREE_P_P(ptr), NULL);
+            freeList[index] = ptr;
         }
         else{
-            SET(NEXT_LSTP(ptr), NULL);
-            SET(PREV_LSTP(ptr), nextPointer);
-            SET(NEXT_LSTP(nextPointer), ptr);
+            SET(FREE_N_P(ptr), NULL);
+            SET(FREE_P_P(ptr), nextPointer);
+            SET(FREE_N_P(nextPointer), ptr);
         }
     }
     else{
         if(nextPointer == NULL){
-            SET(NEXT_LSTP(ptr), bp);
-            SET(PREV_LSTP(bp), ptr);
-            SET(PREV_LSTP(ptr), NULL);
-            tableStart[index] = ptr;
+            SET(FREE_N_P(ptr), bp);
+            SET(FREE_P_P(bp), ptr);
+            SET(FREE_P_P(ptr), NULL);
+            freeList[index] = ptr;
         }
         else{
-            SET(NEXT_LSTP(ptr), bp);
-            SET(PREV_LSTP(bp), ptr);
-            SET(PREV_LSTP(ptr), nextPointer);
-            SET(NEXT_LSTP(nextPointer), ptr);
+            SET(FREE_N_P(ptr), bp);
+            SET(FREE_P_P(bp), ptr);
+            SET(FREE_P_P(ptr), nextPointer);
+            SET(FREE_N_P(nextPointer), ptr);
         }
     }
 
@@ -376,10 +421,10 @@ static void addBlock(char* ptr)
 // current location in the seg free list. Manipulates pointers to connect     //
 // the blocks previous block to connect with the next block.                  //
 /*============================================================================*/
-static void removeBlock(void* bp)
+static void allocate_block(void* bp)
 {
-    char* next = DREF_NP(bp);
-    char* prev = DREF_PP(bp);
+    char* next = ACC_N_P(bp);
+    char* prev = ACC_P_P(bp);
 
     // Determines the block's location in the linked list (beginning, middle,
     // end). Uses that to manipulate pointers.
@@ -388,11 +433,11 @@ static void removeBlock(void* bp)
         if(prev == NULL){
             // Block is only block in list
             int index = size_class(GET_SIZE(HDRP(bp)));
-            tableStart[index] = NULL;
+            freeList[index] = NULL;
         }
         else{
             // block is at end
-            SET(NEXT_LSTP(prev), NULL);
+            SET(FREE_N_P(prev), NULL);
         }
     }
     else{
@@ -400,13 +445,13 @@ static void removeBlock(void* bp)
         if(prev == NULL){
             // block is in the beginning
             int index = size_class(GET_SIZE(HDRP(bp)));
-            tableStart[index] = next;
-            SET(PREV_LSTP(next), NULL);
+            freeList[index] = next;
+            SET(FREE_P_P(next), NULL);
         }
         else{
             // block is in the middle
-            SET(NEXT_LSTP(prev), next);
-            SET(PREV_LSTP(next), prev);
+            SET(FREE_N_P(prev), next);
+            SET(FREE_P_P(next), prev);
         }
     }
     return;
@@ -419,12 +464,12 @@ static void removeBlock(void* bp)
 //        splits only if the size of the remainder would equal or exceed the
 //        minimum block size.
 /*============================================================================*/
-static void place(void* bp, size_t asize)
+static void split_block(void* bp, size_t asize)
 {
     size_t blockSize = GET_SIZE(HDRP(bp));
 
     // Remove block from linked list
-    removeBlock(bp);
+    allocate_block(bp);
 
     // If the size is too small or it will be wasteful to compute a split,
     // just place the memory into the whole free block. change this.
@@ -441,7 +486,7 @@ static void place(void* bp, size_t asize)
             PUT(FTRP(NEXT_BLKP(bp)), PACK(blockSize - asize, 0));
 
             // add second split block into free list
-            addBlock(NEXT_BLKP(bp));
+            free_block(NEXT_BLKP(bp));
 //            printf(" - saved: %lu\n", GET_SIZE(HDRP(NEXT_BLKP(bp))));
 
 
@@ -486,11 +531,11 @@ void *mm_malloc (size_t size)
 
     // search for the size in the seg free list. If there is one, place the
     // block into the free list.
-    bp = find_fit(asize);
+    bp = find_free_block(asize);
 
     // check to see if bp is not NULL
     if(bp != NULL){
-        place(bp, asize);
+        split_block(bp, asize);
         return bp;
     }
     // ELSE extend the size by asize or chunksize, whichever is larger
@@ -498,7 +543,7 @@ void *mm_malloc (size_t size)
     extension = MAX(asize, CHUNKSIZE/WSIZE);
 
     // extend heap since there arent enough free blocks in the free list. why divide by WSIZE?
-    bp = extend_heap(extension/WSIZE);
+    bp = increase_heap(extension/WSIZE);
 
     if(bp == NULL){
         printf("unable to allocate asize: %lu\n", asize);
@@ -507,7 +552,7 @@ void *mm_malloc (size_t size)
     // have to split here
 
     // Next, place the block into the newly allocated memory.
-    place(bp, asize);
+    split_block(bp, asize);
 
     return bp;
 }
@@ -534,7 +579,7 @@ void mm_free (void *bp)
     PUT(FTRP(bp), PACK(size, 0));
 
     //add the free block to the list
-    addBlock(bp);
+    free_block(bp);
     // coalese with any adjacent blocks
     coalesce(bp);
 }
@@ -648,7 +693,7 @@ void *mm_realloc(void *ptr, size_t size){
             // add the size together
             blockSize += nextsize;
             // remove the old block from free list
-            removeBlock(NEXT_BLKP(ptr));
+            allocate_block(NEXT_BLKP(ptr));
             // put new header/footers on block.
             PUT(HDRP(ptr), PACK(blockSize,1));
             PUT(FTRP(ptr), PACK(blockSize,1));
@@ -671,62 +716,7 @@ void *mm_realloc(void *ptr, size_t size){
     return newptr;
 }
 
-/*
- *
- *
- * if (asize < old_size) {
-        // we split the block if the remainder is big enough
-        if (old_size - asize >= MIN_BLOCK_SIZE) {
-            // shrink the old block
-            PUT(HDRP(bp), PACK(asize, 1));
-            PUT(FTRP(bp), PACK(asize, 1));
-            // construct the new block
-            newbp = NEXT_BLKP(bp);
-            PUT(HDRP(newbp), PACK(old_size - asize, 0));
-            PUT(FTRP(newbp), PACK(old_size - asize, 0));
-            // insert new block into free list
-            // zero out pred/succ to be safe
-            PUT(PRED(newbp), 0);
-            PUT(SUCC(newbp), 0);
-            insert(newbp);
-        }
-        // otherwise we don't do anything
-        return oldbp;
-    }
 
-    // if expanding
-    else {
-        // we check if we can make the block large enough by
-        // coalescing with the block to its right
-        nextblc_size = GET_SIZE(HDRP(NEXT_BLKP(bp)));
-        if (!GET_ALLOC(HDRP(NEXT_BLKP(bp)))) {
-            if (nextblc_size + old_size >= asize) {
-                // we coalesce
-                // first, delete the next block from free list
-                delete(NEXT_BLKP(bp));
-                // then we construct a large allocated block
-                PUT(HDRP(bp), PACK(old_size + nextblc_size, 1));
-                PUT(FTRP(bp), PACK(old_size + nextblc_size, 1));
-                return oldbp;
-            }
-        }
-
-        // coalescing with the left won't do any good because
-        // everything still needs to be copied over so in all
-        // other cases, we free the current block and allocate
-        // a new block and copy everything over
-        newbp = mm_malloc(size);
-        copy_size = old_size - DSIZE;
-        memcpy(newbp, oldbp, copy_size);
-        mm_free(bp);
-        return newbp;
-    }
- */
-
-/*
- * Return whether the pointer is in the heap.
- * May be useful for debugging.
- */
 static int in_heap(const void *p) {
     return p <= mem_heap_hi() && p >= mem_heap_lo();
 }
@@ -755,7 +745,7 @@ void mm_checkheap(int lineno)
     // epilogue and prologue blocks.                                          //
     /*--------------------- ------------------------- ------------------------*/
 
-    char* bp = NEXT_BLKP(heapStart);
+    char* bp = NEXT_BLKP(heap);
     size_t  frontSize;
     int     frontAlloc;
     size_t  backSize;
@@ -763,28 +753,28 @@ void mm_checkheap(int lineno)
     int     implicitFreeCount = 0;
 
     // Check if the heap beginning is invalid.
-    if (heapStart == NULL){
-        dbg_printf("heap start is NULL\n");
+    if (heap == NULL){
+        printf("heap start is NULL\n");
         exit(1);
     }
 
     // Check if the table start is invalid.
-    if (tableStart == NULL){
-        dbg_printf("table start is NULL\n");
+    if (freeList == NULL){
+        printf("table start is NULL\n");
         exit(1);
     }
 
     // Check if the epilogue size bits are intact.
-    if(GET_SIZE(HDRP(heapStart)) != DSIZE &&
-       GET_SIZE(FTRP(heapStart)) != DSIZE){
-        dbg_printf("prologue sizes are wrong\n");
+    if(GET_SIZE(HDRP(heap)) != DSIZE &&
+       GET_SIZE(FTRP(heap)) != DSIZE){
+        printf("prologue sizes are wrong\n");
         exit(1);
     }
 
     //Check if the epilogue alloc bits are intact.
-    if(GET_ALLOC(HDRP(heapStart)) != 1 &&
-       GET_ALLOC(FTRP(heapStart)) != 1){
-        dbg_printf("prologue alloc bits are wrong\n");
+    if(GET_ALLOC(HDRP(heap)) != 1 &&
+       GET_ALLOC(FTRP(heap)) != 1){
+        printf("prologue alloc bits are wrong\n");
         exit(1);
     }
 
@@ -792,7 +782,7 @@ void mm_checkheap(int lineno)
     if(GET_SIZE(mem_heap_hi()-WSIZE+1)!=0
        || GET_ALLOC(mem_heap_hi()-WSIZE+1)!= 1)
     {
-        dbg_printf("epilogue block is wrong\n");
+        printf("epilogue block is wrong\n");
         exit(1);
     }
 
@@ -811,29 +801,29 @@ void mm_checkheap(int lineno)
 
         // Check size and alloc consistency (header and footer)
         if(frontSize != backSize || frontAlloc != backAlloc){
-            dbg_printf("header and footers dont match\n");
+            printf("header and footers dont match\n");
             exit(1);
         }
         // Check if the pointer is in the heap.
         if(!in_heap(bp)){
-            dbg_printf("this pointer not even in heap\n");
+            printf("this pointer not even in heap\n");
             exit(1);
         }
         // Check if the pointer is aligned.
 //        if(!aligned(bp)){
-//            dbg_printf("pointer is not aligned.\n");
+//            printf("pointer is not aligned.\n");
 //            exit(1);
 //        }
         // Check for minimum size
         if(frontSize <= DSIZE && frontSize != 0){
-            dbg_printf("block less than minimum size\n");
+            printf("block less than minimum size\n");
             exit(1);
         }
         // Check if two adjacent blocks are both free after coalescing
         // has been called. This can be proved by induction to be true
         // for the whole linked list after being run.
         if(frontAlloc == 0 && GET_ALLOC(HDRP(NEXT_BLKP(bp))) == 0){
-            dbg_printf("coalescing has failed.\n");
+            printf("coalescing has failed.\n");
             exit(1);
         }
         // Increments the number of free blocks (used in a check later)
@@ -852,15 +842,15 @@ void mm_checkheap(int lineno)
     char* turtle;
 
     for(int i = 0; i < 20; i++){
-        rabbit = tableStart[i];
+        rabbit = freeList[i];
         turtle = rabbit;
 
         if(rabbit != NULL && turtle != NULL)
         {
             //rabbit jumps 2 in the linked list
-            if(DREF_NP(rabbit) != NULL){
-                if(DREF_NP(DREF_NP(rabbit))!= NULL){
-                    rabbit = DREF_NP(DREF_NP(rabbit));
+            if(ACC_N_P(rabbit) != NULL){
+                if(ACC_N_P(ACC_N_P(rabbit))!= NULL){
+                    rabbit = ACC_N_P(ACC_N_P(rabbit));
                 }
                 else{
                     rabbit = NULL;
@@ -871,8 +861,8 @@ void mm_checkheap(int lineno)
             }
 
             // turtle crawls one in the linked list
-            if(DREF_NP(turtle) != NULL){
-                turtle = DREF_NP(turtle);
+            if(ACC_N_P(turtle) != NULL){
+                turtle = ACC_N_P(turtle);
             }else{
                 turtle = NULL;
             }
@@ -880,7 +870,7 @@ void mm_checkheap(int lineno)
             // Check if the rabbit is on the turtle (means there's a loop)
             if(rabbit == turtle){
                 if(rabbit != NULL){
-                    dbg_printf("there is a loop in you linked list.\n");
+                    printf("there is a loop in you linked list.\n");
                     exit(1);
                 }
                 else{
@@ -900,14 +890,14 @@ void mm_checkheap(int lineno)
     for(int i = 0; i < 20; i++)
     {
         // init the pointer to beginning of linked list
-        bp = tableStart[i];
+        bp = freeList[i];
         while(bp != NULL)
         {
             // Checks if the previous pointer of the next pointer is itself
-            if((DREF_NP(bp) != NULL && DREF_PP(DREF_NP(bp)) != NULL) &&
-               DREF_PP(DREF_NP(bp)) != bp)
+            if((ACC_N_P(bp) != NULL && ACC_P_P(ACC_N_P(bp)) != NULL) &&
+                    ACC_P_P(ACC_N_P(bp)) != bp)
             {
-                dbg_printf("previous pointer of next is not itself.\n");
+                printf("previous pointer of next is not itself.\n");
                 exit(1);
             }
 
@@ -916,14 +906,14 @@ void mm_checkheap(int lineno)
             // pointers will also be correct.
             if(!in_heap(bp))
             {
-                dbg_printf("bp is not in the right range.\n");
+                printf("bp is not in the right range.\n");
                 exit(1);
             }
             // Checks if the next pointer of bp is within range of the
             // memory heap's maximum and minimum.
-            if(DREF_NP(bp)!= NULL && !(in_heap(DREF_NP(bp))))
+            if(ACC_N_P(bp)!= NULL && !(in_heap(ACC_N_P(bp))))
             {
-                dbg_printf("next pointer is not in the right range");
+                printf("next pointer is not in the right range");
                 exit(1);
             }
 
@@ -933,7 +923,7 @@ void mm_checkheap(int lineno)
                 // if size is in the largest size range (19).
                 if(i != 19)
                 {
-                    dbg_printf("block is in wrong index (too large)\n");
+                    printf("block is in wrong index (too large)\n");
                     exit(1);
                 }
             }
@@ -941,25 +931,26 @@ void mm_checkheap(int lineno)
                 // if size is in other size ranges (0-18)
                 if(!(GET_SIZE(HDRP(bp))/WSIZE < (size_t) (1<<(i+5))))
                 {
-                    dbg_printf("block is in wrong index (too small)\n");
+                    printf("block is in wrong index (too small)\n");
                     exit(1);
                 }
             }
 
             // Change to the next pointer in the linked list
-            bp = DREF_NP(bp);
+            bp = ACC_N_P(bp);
             totalFree++;
         }
     }
 
     /*====================== Total Free Block Checker ========================*/
-    // Operates after the addBlock function, and checks if the total number   //
+    // Operates after the free_block function, and checks if the total number   //
+    // Operates after the free_block function, and checks if the total number   //
     // of blocks counted with the implicit list is equal to the total number  //
     // from the segregated freelist count.                                    //
     /*====================== ======================== ========================*/
 
     if(lineno == 2 && totalFree != implicitFreeCount){
-        dbg_printf("free block counts are different! (%d != %d)\n", totalFree,
+        printf("free block counts are different! (%d != %d)\n", totalFree,
                    implicitFreeCount);
 //        exit(1);
     }
